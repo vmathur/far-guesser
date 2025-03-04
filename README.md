@@ -1,6 +1,6 @@
 # 🖼️ frames-v2-demo
 
-A Farcaster Frames v2 demo app.
+FarGuesser.
 
 [🛠️ Frame Playground](https://warpcast.com/~/developers/frame-playground) (Mobile only)<br/>
 [📦 Frame SDK](https://github.com/farcasterxyz/frames/)<br/>
@@ -228,8 +228,8 @@ import "~/app/globals.css";
 import { Providers } from "~/app/providers";
 
 export const metadata: Metadata = {
-  title: "Farcaster Frames v2 Demo",
-  description: "A Farcaster Frames v2 demo app",
+  title: "FarGuesser",
+  description: "Guess the location",
 };
 
 export default function RootLayout({

@@ -30,3 +30,36 @@ export async function deleteUserNotificationDetails(
 ): Promise<void> {
   await redis.del(getUserNotificationDetailsKey(fid));
 }
+
+// Leaderboard functions
+interface LeaderboardEntry {
+  name: string;
+  score: number;
+  timestamp: number;
+}
+
+function getLeaderboardKey(): string {
+  return `far-guesser:leaderboard`;
+}
+
+export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
+  const leaderboard = await redis.get<LeaderboardEntry[]>(getLeaderboardKey());
+  return leaderboard || [];
+}
+
+export async function submitScore(entry: LeaderboardEntry): Promise<void> {
+  // Get current leaderboard
+  const leaderboard = await getLeaderboard();
+  
+  // Add new entry
+  leaderboard.push(entry);
+  
+  // Sort by score (lower is better for distance)
+  leaderboard.sort((a, b) => a.score - b.score);
+  
+  // Limit to top 100 scores
+  const topScores = leaderboard.slice(0, 100);
+  
+  // Store back in KV
+  await redis.set(getLeaderboardKey(), topScores);
+}
