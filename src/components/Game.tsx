@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { CSSProperties } from 'react';
 import RulesScreen from './RulesScreen';
+import AutoAuthFrame from './AutoAuthFrame';
 
 // Use dynamic import for the LocationGuesserView component to avoid SSR issues
 const LocationGuesserView = dynamic(() => import('./LocationGuesserView'), {
@@ -28,13 +29,18 @@ const FarGuesser = () => {
   };
 
   return (
-    <div style={styles.container}>
-      {showRules ? (
-        <RulesScreen onPlay={handlePlay} />
-      ) : (
-        <LocationGuesserView />
-      )}
-    </div>
+    <>
+      {/* Include the AutoAuthFrame component to handle authentication and frame addition */}
+      <AutoAuthFrame />
+      
+      <div style={styles.container}>
+        {showRules ? (
+          <RulesScreen onPlay={handlePlay} />
+        ) : (
+          <LocationGuesserView />
+        )}
+      </div>
+    </>
   );
 };
 

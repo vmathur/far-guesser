@@ -1,21 +1,18 @@
 export async function GET() {
-  // const appUrl = process.env.NEXT_PUBLIC_URL
-    const appUrl = 'https://13588cbba2cc.ngrok.app/'
+  const appUrl = process.env.NEXT_PUBLIC_URL
 
   const config = {
     accountAssociation: {
-      header:
-        "eyJmaWQiOjE3NTkyLCJ0eXBlIjoiY3VzdG9keSIsImtleSI6IjB4YUQ3YjNlMTBhZDc3NEMxOTM4ZGFDQzEyNGYxMTk4M2YwRTRkQTM3MSJ9",
-      payload: "eyJkb21haW4iOiIxMzU4OGNiYmEyY2Mubmdyb2suYXBwIn0",
-      signature:
-        "MHgyODEwNzUxYWRmMjFmNzMzMjkzYmJhNWMwYTkxNTIxN2E4MTkzNmYwNGNiNDJkOWNmM2U2NDI0YTY3ODA3ODYxMGE0ODY1Nzg4ZmYzOTNhYzk5ZDM5OGRmYzZkNzUxYmY4ZGFiY2Q0YWY5OGEzMWFhMWE5OGE0YTY2NTU4YWVlZDFi",
+      header: "eyJmaWQiOjE3NTkyLCJ0eXBlIjoiY3VzdG9keSIsImtleSI6IjB4YUQ3YjNlMTBhZDc3NEMxOTM4ZGFDQzEyNGYxMTk4M2YwRTRkQTM3MSJ9",
+      payload: "eyJkb21haW4iOiIzNDBmODlhMGU0ZmYubmdyb2suYXBwIn0",
+      signature: "MHhhNmY5MDY3Mjg5NDFkM2ViNjE4ODA5NGI1YmIyZDAyNTc3YzFkMzZlOTYxNDBiNDQ0YTEzOGQ0OThiYWQxN2MzNjVjZGYyMGE0OGE4ZDljMzM0NjExZTg0NWJlNmQ1ZWQwODJkNDFlMWNhMjlmMTY4ZjkzMjcxNWI2ODljMzFjOTFi"
     },
     frame: {
       version: "1",
-      name: "Frames v2 Demo",
+      name: "FarGuesser",
       iconUrl: `${appUrl}icon.png`,
       homeUrl: `${appUrl}`,
-      imageUrl: `${appUrl}frames/hello/opengraph-image`,
+      imageUrl: `${appUrl}icon.png`,
       buttonTitle: "Launch Frame",
       splashImageUrl: `${appUrl}splash.png`,
       splashBackgroundColor: "#f7f7f7",
