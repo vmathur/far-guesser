@@ -1,10 +1,6 @@
-# 🖼️ frames-v2-demo
+# 🖼️ FarGuesser.
 
 FarGuesser.
-
-[🛠️ Frame Playground](https://warpcast.com/~/developers/frame-playground) (Mobile only)<br/>
-[📦 Frame SDK](https://github.com/farcasterxyz/frames/)<br/>
-[👀 Dev preview docs](https://github.com/farcasterxyz/frames/wiki/frames-v2-developer-playground-preview)<br/>
 
 ## Getting Started
 
