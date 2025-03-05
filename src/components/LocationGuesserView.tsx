@@ -273,6 +273,87 @@ const LocationGuesserView = () => {
     };
   }, [timeLeft, gameState]);
 
+  // Ref to track if Google Maps API is already loading or loaded
+  const googleMapsLoadingRef = useRef(false);
+  
+  // Shared function to load Google Maps API
+  const loadGoogleMapsAPI = useCallback((callback: () => void, callerName: string) => {
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    
+    if (!apiKey) {
+      console.error("Google Maps API key is not defined");
+      return;
+    }
+    
+    // Check if the API is already loaded
+    if (window.google && window.google.maps) {
+      console.log("Google Maps API already loaded, initializing", callerName);
+      callback();
+      return;
+    }
+    
+    // Check if already loading
+    if (googleMapsLoadingRef.current) {
+      console.log("Google Maps API is already being loaded, waiting for it...");
+      
+      // Set up an interval to check when the API is ready
+      const checkInterval = setInterval(() => {
+        if (window.google && window.google.maps) {
+          console.log("Google Maps API now available, initializing", callerName);
+          clearInterval(checkInterval);
+          callback();
+        }
+      }, 500);
+      
+      // Clear interval after 10 seconds to avoid infinite checking
+      setTimeout(() => {
+        clearInterval(checkInterval);
+      }, 10000);
+      
+      return;
+    }
+    
+    // Set loading flag
+    googleMapsLoadingRef.current = true;
+    console.log("Loading Google Maps API for", callerName);
+    
+    // Create a unique callback name to avoid conflicts
+    const callbackName = 'googleMapsCallback' + new Date().getTime();
+    
+    // Use direct indexing with any
+    window[callbackName] = () => {
+      console.log("Google Maps API loaded via script");
+      googleMapsLoadingRef.current = false;
+      
+      // Call the initialization function
+      callback();
+      
+      // Clean up
+      delete window[callbackName];
+    };
+    
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=${callbackName}`;
+    script.async = true;
+    script.defer = true;
+    script.id = 'google-maps-script';
+    
+    // Handle errors
+    script.onerror = () => {
+      console.error("Failed to load Google Maps API");
+      googleMapsLoadingRef.current = false;
+      setLoading(false);
+    };
+    
+    // Remove any existing Google Maps scripts to avoid conflicts
+    const existingScript = document.getElementById('google-maps-script');
+    if (existingScript) {
+      existingScript.remove();
+    }
+    
+    document.head.appendChild(script);
+  }, []);
+
   // Initialize Street View
   useEffect(() => {
     // Only initialize Street View when in viewing state
@@ -282,59 +363,6 @@ const LocationGuesserView = () => {
     setLoading(true);
 
     // Load the Google Maps JavaScript API - simplified approach
-    const loadGoogleMapsAPI = () => {
-      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-      
-      if (!apiKey) {
-        console.error("Google Maps API key is not defined");
-        return;
-      }
-      
-      // Check if the API is already loaded
-      if (window.google && window.google.maps) {
-        console.log("Google Maps API already loaded, initializing Street View");
-        initializeStreetView();
-        return;
-      }
-      
-      console.log("Loading Google Maps API...");
-      
-      // Create a unique callback name to avoid conflicts
-      const callbackName = 'initializeStreetView' + new Date().getTime();
-      
-      // Use direct indexing with any
-      window[callbackName] = () => {
-        console.log("Google Maps API loaded via script");
-        if (streetViewRef.current && gameState === 'viewing') {
-          initializeStreetView();
-        }
-        
-        // Clean up
-        delete window[callbackName];
-      };
-      
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=${callbackName}`;
-      script.async = true;
-      script.defer = true;
-      script.id = 'google-maps-script';
-      
-      // Handle errors
-      script.onerror = () => {
-        console.error("Failed to load Google Maps API");
-        setLoading(false);
-      };
-      
-      // Remove any existing Google Maps scripts to avoid conflicts
-      const existingScript = document.getElementById('google-maps-script');
-      if (existingScript) {
-        existingScript.remove();
-      }
-      
-      document.head.appendChild(script);
-    };
-    
-    // Initialize the Street View panorama with error handling
     const initializeStreetView = () => {
       if (!streetViewRef.current || !window.google || !window.google.maps) {
         console.error("Cannot initialize Street View: required objects missing");
@@ -383,13 +411,13 @@ const LocationGuesserView = () => {
       }
     };
     
-    loadGoogleMapsAPI();
+    loadGoogleMapsAPI(initializeStreetView, 'Street View');
     
     // Clean up
     return () => {
       console.log("Cleaning up Street View effect");
     };
-  }, [currentLocation, gameState]);
+  }, [currentLocation, gameState]); // Removed loadGoogleMapsAPI from dependencies
 
   // Initialize the guessing map with shared API loading
   useEffect(() => {
@@ -403,62 +431,8 @@ const LocationGuesserView = () => {
       return;
     }
     
-    // Simplified API check and initialization
-    if (!window.google || !window.google.maps) {
-      console.log("Google Maps API not loaded for map view, trying to load");
-      
-      // Check if we're already loading the API (script exists)
-      const existingScript = document.getElementById('google-maps-script');
-      if (existingScript) {
-        console.log("API is already loading, waiting...");
-        const checkInterval = setInterval(() => {
-          if (window.google && window.google.maps) {
-            console.log("Google Maps API now available, initializing map");
-            clearInterval(checkInterval);
-            initializeMapForGuessing();
-          }
-        }, 500);
-        
-        // Clear interval after 10 seconds to avoid infinite checking
-        setTimeout(() => {
-          clearInterval(checkInterval);
-        }, 10000);
-        return;
-      }
-      
-      // Load the API if not already loading
-      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-      if (!apiKey) {
-        console.error("Google Maps API key is not defined");
-        return;
-      }
-      
-      const callbackName = 'googleMapsInitMap' + new Date().getTime();
-      
-      // Use direct indexing with any
-      window[callbackName] = () => {
-        console.log("Google Maps API loaded for map view");
-        if (mapRef.current && gameState === 'guessing') {
-          initializeMapForGuessing();
-        }
-        delete window[callbackName];
-      };
-      
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=${callbackName}`;
-      script.async = true;
-      script.defer = true;
-      script.id = 'google-maps-script';
-      
-      script.onerror = () => {
-        console.error("Failed to load Google Maps API for map view");
-      };
-      
-      document.head.appendChild(script);
-      return;
-    }
-    
-    initializeMapForGuessing();
+    // Use the shared function to load Google Maps API
+    loadGoogleMapsAPI(initializeMapForGuessing, 'Guessing Map');
     
     function initializeMapForGuessing() {
       if (!mapRef.current) {
@@ -584,7 +558,7 @@ const LocationGuesserView = () => {
     return () => {
       console.log("Cleaning up map effect");
     };
-  }, [gameState, currentLocation.position.lat, currentLocation.position.lng, calculateDistance]); // Removed marker from dependencies
+  }, [gameState, currentLocation.position.lat, currentLocation.position.lng, calculateDistance]); // Removed loadGoogleMapsAPI from dependencies
 
   // Initialize the results map with both pins and a line between them
   useEffect(() => {
@@ -598,62 +572,8 @@ const LocationGuesserView = () => {
       googleMapRef.current = null;
     }
     
-    // Check if Google Maps API is loaded
-    if (!window.google || !window.google.maps) {
-      console.log("Google Maps API not loaded for results view, waiting...");
-      
-      // Check if we're already loading the API (script exists)
-      const existingScript = document.getElementById('google-maps-script');
-      if (existingScript) {
-        console.log("API is already loading, waiting...");
-        const checkInterval = setInterval(() => {
-          if (window.google && window.google.maps) {
-            console.log("Google Maps API now available, initializing results map");
-            clearInterval(checkInterval);
-            initializeResultsMap();
-          }
-        }, 500);
-        
-        // Clear interval after 10 seconds to avoid infinite checking
-        setTimeout(() => {
-          clearInterval(checkInterval);
-        }, 10000);
-        return;
-      }
-      
-      // Load the API if not already loading
-      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-      if (!apiKey) {
-        console.error("Google Maps API key is not defined");
-        return;
-      }
-      
-      const callbackName = 'googleMapsResultsMap' + new Date().getTime();
-      
-      // Use direct indexing with any
-      window[callbackName] = () => {
-        console.log("Google Maps API loaded for results view");
-        if (mapRef.current && gameState === 'results') {
-          initializeResultsMap();
-        }
-        delete window[callbackName];
-      };
-      
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=${callbackName}`;
-      script.async = true;
-      script.defer = true;
-      script.id = 'google-maps-script';
-      
-      script.onerror = () => {
-        console.error("Failed to load Google Maps API for results view");
-      };
-      
-      document.head.appendChild(script);
-      return;
-    }
-    
-    initializeResultsMap();
+    // Use the shared function to load Google Maps API
+    loadGoogleMapsAPI(initializeResultsMap, 'Results Map');
     
     function initializeResultsMap() {
       if (!mapRef.current || !guess) {
@@ -785,11 +705,11 @@ const LocationGuesserView = () => {
       }
     }
     
+    // Clean up function
     return () => {
-      // Clean up
       console.log("Cleaning up results map effect");
     };
-  }, [gameState, guess, currentLocation.position]);
+  }, [gameState, guess, currentLocation.position]); // Removed loadGoogleMapsAPI from dependencies
 
   // Load leaderboard data when entering leaderboard state
   useEffect(() => {
@@ -923,13 +843,17 @@ const LocationGuesserView = () => {
             <div style={{ 
               backgroundColor: '#f0f0f0',
               color: '#333',
-              padding: '5px 10px',
-              borderRadius: '4px',
-              fontSize: '16px',
+              padding: '8px 15px',
+              borderRadius: '8px',
+              fontSize: '36px',  // Increased from 28px to 36px
               fontWeight: 'bold',
-              marginBottom: '10px',
+              marginBottom: '15px',
               display: 'inline-block',
-              border: '1px solid #ddd'
+              border: '2px solid #ddd',
+              fontFamily: '"Chalkboard SE", "Marker Felt", "Comic Sans MS", cursive', // Enhanced playful font choices
+              boxShadow: '0 3px 6px rgba(0,0,0,0.1)',
+              transition: 'all 0.3s ease',
+              transform: timeLeft < 3000 ? 'scale(1.1)' : 'scale(1)', // Increased scale effect
             }}>
               {(timeLeft / 1000).toFixed(2)}
             </div>
@@ -988,7 +912,8 @@ const LocationGuesserView = () => {
                   borderRadius: '4px',
                   cursor: 'pointer',
                   fontSize: '16px',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  fontFamily: '"Chalkboard SE", "Marker Felt", "Comic Sans MS", cursive'
                 }}
               >
                 Guess Location
@@ -1087,7 +1012,12 @@ const LocationGuesserView = () => {
             
             {guess && (
               <>
-                <div style={{ fontSize: '20px', marginBottom: '20px', color: '#000' }}>
+                <div style={{ 
+                  fontSize: '20px', 
+                  marginBottom: '20px', 
+                  color: '#000',
+                  fontFamily: '"Chalkboard SE", "Marker Felt", "Comic Sans MS", cursive'
+                }}>
                   Your guess was <strong>{guess.distance.toLocaleString()}</strong> km away
                 </div>
                 
@@ -1209,10 +1139,15 @@ const LocationGuesserView = () => {
                   boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                   marginBottom: '30px'
                 }}>
-                  <table style={{ 
-                    width: '100%', 
+                  <table style={{
+                    width: '100%',
                     borderCollapse: 'collapse',
-                    fontSize: '16px'
+                    marginBottom: '30px',
+                    backgroundColor: 'white',
+                    borderRadius: '8px',
+                    overflow: 'hidden',
+                    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                    fontFamily: '"Chalkboard SE", "Marker Felt", "Comic Sans MS", cursive'
                   }}>
                     <thead>
                       <tr style={{ borderBottom: '2px solid #eee' }}>
@@ -1274,7 +1209,8 @@ const LocationGuesserView = () => {
                     fontWeight: 'bold',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '8px'
+                    gap: '8px',
+                    fontFamily: '"Chalkboard SE", "Marker Felt", "Comic Sans MS", cursive'
                   }}>
                     <span>Share</span>
                   </button>
@@ -1288,9 +1224,7 @@ const LocationGuesserView = () => {
                     cursor: 'pointer',
                     fontSize: '16px',
                     fontWeight: 'bold',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
+                    fontFamily: '"Chalkboard SE", "Marker Felt", "Comic Sans MS", cursive'
                   }}>
                     <span>Notify Me</span>
                   </button>
