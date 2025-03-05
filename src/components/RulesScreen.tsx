@@ -43,7 +43,6 @@ const RulesScreen: React.FC<RulesScreenProps> = ({ onPlay }) => {
       color: '#444',
       marginBottom: '15px',
       lineHeight: '1.5',
-      boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
     },
     playButton: {
       backgroundColor: '#4CAF50',
@@ -73,7 +72,7 @@ const RulesScreen: React.FC<RulesScreenProps> = ({ onPlay }) => {
       <div style={styles.rulesContainer}>
         <p style={styles.rule}>
           <span style={styles.emoji}>🌍</span>
-          1. Explore a location for up to 10 seconds
+          1. Explore a location for 10 seconds
         </p>
         <p style={styles.rule}>
           <span style={styles.emoji}>🎯</span>

@@ -854,8 +854,10 @@ const LocationGuesserView = () => {
               boxShadow: '0 3px 6px rgba(0,0,0,0.1)',
               transition: 'all 0.3s ease',
               transform: timeLeft < 3000 ? 'scale(1.1)' : 'scale(1)', // Increased scale effect
+              width: '160px',  // Increased from 120px to 160px for better spacing
+              textAlign: 'center', // Center the text within the fixed width
             }}>
-              {(timeLeft / 1000).toFixed(2)}
+              {(timeLeft / 1000).toFixed(2) +' s'}
             </div>
             
             <div 
@@ -894,30 +896,6 @@ const LocationGuesserView = () => {
                   Loading Street View...
                 </div>
               )}
-            </div>
-            
-            <div style={{ 
-              marginBottom: '20px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}>
-              <button 
-                onClick={handleGuessLocationClick}
-                style={{
-                  padding: '12px 24px',
-                  backgroundColor: '#4CAF50',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  fontWeight: 'bold',
-                  fontFamily: '"Chalkboard SE", "Marker Felt", "Comic Sans MS", cursive'
-                }}
-              >
-                Guess Location
-              </button>
             </div>
           </div>
         );
