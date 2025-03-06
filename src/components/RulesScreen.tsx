@@ -101,10 +101,6 @@ const RulesScreen: React.FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
       >
         Play
       </button>
-      
-      <div style={styles.fontInfo}>
-        Using font: {selectedFont}
-      </div>
     </div>
   );
 };
