@@ -39,7 +39,7 @@ const RulesScreen: React.FC<RulesScreenProps> = ({ onPlay }) => {
       margin: '10px 0',
       borderRadius: '10px',
       fontFamily: '"Chalkboard SE", "Marker Felt", "Comic Sans MS", cursive',
-      fontSize: '1.3em',
+      fontSize: '1.2em',
       color: '#444',
       marginBottom: '15px',
       lineHeight: '1.5',
@@ -71,15 +71,12 @@ const RulesScreen: React.FC<RulesScreenProps> = ({ onPlay }) => {
       
       <div style={styles.rulesContainer}>
         <p style={styles.rule}>
-          <span style={styles.emoji}>🌍</span>
           1. Explore a location for 10 seconds
         </p>
         <p style={styles.rule}>
-          <span style={styles.emoji}>🎯</span>
           2. Guess the location on the map. Closer to the target, better the score
         </p>
         <p style={styles.rule}>
-          <span style={styles.emoji}>🏆</span>
           3. New round each day. Compete with others on Farcaster
         </p>
       </div>
