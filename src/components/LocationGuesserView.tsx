@@ -112,7 +112,7 @@ const LocationGuesserView = () => {
         );
       
       case 'leaderboard':
-        return <LeaderboardView onPlayAgain={goToNextLocation} />;
+        return <LeaderboardView />;
       
       default:
         return <div>Unknown game state.</div>;

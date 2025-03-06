@@ -106,7 +106,7 @@ const StreetView: React.FC<StreetViewProps> = ({
       {/* Timer component at the top */}
       <div style={{ 
         backgroundColor: '#f0f0f0',
-        color: '#333',
+        color: timeLeft <= 5000 ? 'red' : '#333',
         padding: '8px 15px',
         borderRadius: '8px',
         fontSize: '36px',

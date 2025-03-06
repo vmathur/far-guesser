@@ -19,7 +19,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   const googleMapRef = useRef<google.maps.Map | null>(null);
   const [loading, setLoading] = useState(true);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
-  const [playerName, setPlayerName] = useState('');
   
   const loadGoogleMapsAPI = useGoogleMapsLoader(setLoading);
 
@@ -152,10 +151,14 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     };
   }, [actualLocation, guess, loadGoogleMapsAPI]);
 
-  const handleSubmitScore = () => {
-    if (!playerName) return;
-    setShowLeaderboard(true);
-    // In a real app, would submit score to API here
+  const handleShare = () => {
+    // In a real app, would implement sharing functionality here
+    alert('Sharing functionality would go here');
+  };
+
+  const handleShowLeaderboard = () => {
+    // Navigate to the leaderboard view using the onNextLocation callback
+    onNextLocation();
   };
 
   return (
@@ -167,15 +170,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({
       boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
       color: '#000'
     }}>
-      
-      <div style={{ 
-        fontSize: '20px', 
-        marginBottom: '20px', 
-        color: '#000',
-        fontFamily: '"Chalkboard SE", "Marker Felt", "Comic Sans MS", cursive'
-      }}>
-        Your guess was <strong>{guess.distance.toLocaleString()}</strong> km away
-      </div>
       
       <div style={{ 
         height: '500px', 
@@ -214,44 +208,36 @@ const ResultsView: React.FC<ResultsViewProps> = ({
         ></div>
       </div>
       
+      <div style={{ 
+        fontSize: '20px', 
+        marginBottom: '20px', 
+        color: '#000',
+        fontFamily: '"Chalkboard SE", "Marker Felt", "Comic Sans MS", cursive'
+      }}>
+        Your guess was <strong>{guess.distance.toLocaleString()}</strong> km away
+      </div>
+      
       {!showLeaderboard ? (
         <div style={{ marginBottom: '20px' }}>
-          <p style={{ marginBottom: '10px' }}>Enter your name for the leaderboard:</p>
-          <input
-            type="text"
-            value={playerName}
-            onChange={(e) => setPlayerName(e.target.value)}
-            placeholder="Your name"
-            style={{
-              padding: '10px',
-              borderRadius: '4px',
-              border: '1px solid #ddd',
-              width: '100%',
-              maxWidth: '300px',
-              fontSize: '16px',
-              marginBottom: '10px'
-            }}
-          />
           <div>
             <button
-              onClick={handleSubmitScore}
-              disabled={!playerName}
+              onClick={handleShare}
               style={{
                 padding: '10px 20px',
-                backgroundColor: playerName ? '#4CAF50' : '#cccccc',
+                backgroundColor: '#4CAF50',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
-                cursor: playerName ? 'pointer' : 'not-allowed',
+                cursor: 'pointer',
                 fontSize: '16px',
                 fontWeight: 'bold',
                 marginRight: '10px'
               }}
             >
-              Submit Score
+              Share
             </button>
             <button
-              onClick={onNextLocation}
+              onClick={handleShowLeaderboard}
               style={{
                 padding: '10px 20px',
                 backgroundColor: '#3498db',
@@ -263,7 +249,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
                 fontWeight: 'bold'
               }}
             >
-              Skip & Play Again
+              Leaderboard
             </button>
           </div>
         </div>

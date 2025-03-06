@@ -4,10 +4,10 @@ import React, { useEffect, useState } from 'react';
 import { LeaderboardEntry } from './types/LocationGuesserTypes';
 
 interface LeaderboardViewProps {
-  onPlayAgain: () => void;
+  // Removed onPlayAgain prop
 }
 
-const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onPlayAgain }) => {
+const LeaderboardView: React.FC<LeaderboardViewProps> = () => {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -127,25 +127,6 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onPlayAgain }) => {
                 ))}
               </tbody>
             </table>
-          </div>
-          
-          <div style={{ textAlign: 'center' }}>
-            <button 
-              onClick={onPlayAgain}
-              style={{
-                padding: '15px 30px',
-                backgroundColor: '#4CAF50',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '18px',
-                fontWeight: 'bold',
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)'
-              }}
-            >
-              Play Again
-            </button>
           </div>
         </>
       )}
