@@ -8,12 +8,14 @@ interface ResultsViewProps {
   guess: Guess;
   actualLocation: Location;
   onNextLocation: () => void;
+  selectedFont?: string;
 }
 
 const ResultsView: React.FC<ResultsViewProps> = ({ 
   guess, 
   actualLocation, 
-  onNextLocation 
+  onNextLocation,
+  selectedFont = 'Chalkboard SE'
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const googleMapRef = useRef<google.maps.Map | null>(null);
@@ -212,7 +214,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
         fontSize: '20px', 
         marginBottom: '20px', 
         color: '#000',
-        fontFamily: '"Chalkboard SE", "Marker Felt", "Comic Sans MS", cursive'
+        fontFamily: `"${selectedFont}", "Comic Sans MS", cursive`
       }}>
         Your guess was <strong>{guess.distance.toLocaleString()}</strong> km away
       </div>

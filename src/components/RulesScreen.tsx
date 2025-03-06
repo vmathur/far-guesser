@@ -3,9 +3,10 @@ import { CSSProperties } from 'react';
 
 interface RulesScreenProps {
   onPlay: () => void;
+  selectedFont: string;
 }
 
-const RulesScreen: React.FC<RulesScreenProps> = ({ onPlay }) => {
+const RulesScreen: React.FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
   const styles: Record<string, CSSProperties> = {
     container: {
       textAlign: 'center' as const,
@@ -21,7 +22,7 @@ const RulesScreen: React.FC<RulesScreenProps> = ({ onPlay }) => {
       fontSize: '3.2em',
       color: '#333',
       marginBottom: '25px',
-      fontFamily: '"Chalkboard SE", "Marker Felt", "Comic Sans MS", cursive',
+      fontFamily: `"${selectedFont}", "Comic Sans MS", cursive`,
       textShadow: '2px 2px 4px rgba(0,0,0,0.1)',
     },
     rulesContainer: {
@@ -38,7 +39,7 @@ const RulesScreen: React.FC<RulesScreenProps> = ({ onPlay }) => {
       padding: '15px 15px 15px 35px',
       margin: '10px 0',
       borderRadius: '10px',
-      fontFamily: '"Chalkboard SE", "Marker Felt", "Comic Sans MS", cursive',
+      fontFamily: `"${selectedFont}", "Comic Sans MS", cursive`,
       fontSize: '1.2em',
       color: '#444',
       marginBottom: '15px',
@@ -54,7 +55,7 @@ const RulesScreen: React.FC<RulesScreenProps> = ({ onPlay }) => {
       cursor: 'pointer',
       fontWeight: 'bold',
       transition: 'all 0.3s',
-      fontFamily: '"Chalkboard SE", "Marker Felt", "Comic Sans MS", cursive',
+      fontFamily: `"${selectedFont}", "Comic Sans MS", cursive`,
       boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
       transform: 'scale(1)',
     },
@@ -62,6 +63,11 @@ const RulesScreen: React.FC<RulesScreenProps> = ({ onPlay }) => {
       position: 'absolute',
       left: '0',
       fontSize: '1.4em',
+    },
+    fontInfo: {
+      marginTop: '10px',
+      fontSize: '0.9em',
+      color: '#666',
     }
   };
 
@@ -95,6 +101,10 @@ const RulesScreen: React.FC<RulesScreenProps> = ({ onPlay }) => {
       >
         Play
       </button>
+      
+      <div style={styles.fontInfo}>
+        Using font: {selectedFont}
+      </div>
     </div>
   );
 };

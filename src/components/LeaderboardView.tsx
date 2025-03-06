@@ -4,10 +4,14 @@ import React, { useEffect, useState } from 'react';
 import { LeaderboardEntry } from './types/LocationGuesserTypes';
 
 interface LeaderboardViewProps {
-  // Removed onPlayAgain prop
+  onNextLocation?: () => void;
+  selectedFont?: string;
 }
 
-const LeaderboardView: React.FC<LeaderboardViewProps> = () => {
+const LeaderboardView: React.FC<LeaderboardViewProps> = ({ 
+  onNextLocation, 
+  selectedFont = 'Chalkboard SE' 
+}) => {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -58,17 +62,17 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = () => {
   };
 
   return (
-    <div style={{
+    <div style={{ 
       padding: '20px',
-      backgroundColor: '#f9f9f9',
-      borderRadius: '8px',
-      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
+      maxWidth: '600px',
+      margin: '0 auto',
+      fontFamily: `"${selectedFont}", "Comic Sans MS", cursive`
     }}>
       <h2 style={{ 
         color: '#333', 
         marginBottom: '20px',
         textAlign: 'center',
-        fontFamily: '"Chalkboard SE", "Marker Felt", "Comic Sans MS", cursive'
+        fontFamily: `"${selectedFont}", "Marker Felt", cursive`
       }}>
         Leaderboard
       </h2>

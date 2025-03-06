@@ -9,7 +9,11 @@ import GuessingMap from './GuessingMap';
 import ResultsView from './ResultsView';
 import LeaderboardView from './LeaderboardView';
 
-const LocationGuesserView = () => {
+interface LocationGuesserViewProps {
+  selectedFont: string;
+}
+
+const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({ selectedFont }) => {
   const [timeLeft, setTimeLeft] = useState(10000); // In milliseconds (10 seconds)
   const [gameState, setGameState] = useState<GameState>('viewing');
   const [guess, setGuess] = useState<Guess | null>(null);
@@ -28,54 +32,30 @@ const LocationGuesserView = () => {
         setTimeLeft(prev => Math.max(0, prev - 100)); // Decrease by 100ms
       }, 100); // Update every 100ms
     } else if (gameState === 'viewing' && timeLeft === 0) {
-      // Time's up, move to guessing state
       setGameState('guessing');
     }
     
     return () => {
       if (timerId) clearTimeout(timerId);
     };
-  }, [timeLeft, gameState]);
+  }, [gameState, timeLeft]);
 
-  // Time's up handler (passed to StreetView component)
-  const handleTimeEnd = useCallback(() => {
+  // Handle time running out
+  const handleTimeEnd = () => {
     setGameState('guessing');
-  }, []);
+  };
 
-  // Reset the game and move to the next location
-  const goToNextLocation = useCallback(() => {
-    // If we're on the results screen, go to leaderboard instead of starting a new game
-    if (gameState === 'results') {
-      setGameState('leaderboard');
-      return;
-    }
-    
-    // Reset the game state
-    setGameState('viewing');
-    setTimeLeft(10000); // Reset to 10 seconds in milliseconds
-    setGuess(null);
-    
-    // Select a new random location
-    let newLocation: Location;
-    do {
-      newLocation = locations[Math.floor(Math.random() * locations.length)];
-    } while (newLocation.position.lat === currentLocation.position.lat && 
-             newLocation.position.lng === currentLocation.position.lng);
-    
-    setCurrentLocation(newLocation);
-  }, [currentLocation, gameState]);
-
-  // Handle guess submission (passed to GuessingMap component)
+  // Handle guess submission
   const handleGuessSubmitted = useCallback((submittedGuess: Guess) => {
-    // Calculate the distance between the guess and actual location
+    // Calculate distance
     const distance = calculateDistance(
-      submittedGuess.position.lat,
-      submittedGuess.position.lng,
+      submittedGuess.position.lat, 
+      submittedGuess.position.lng, 
       currentLocation.position.lat,
       currentLocation.position.lng
     );
     
-    // Update the guess with the calculated distance
+    // Create a new guess with the calculated distance
     const guessWithDistance: Guess = {
       ...submittedGuess,
       distance
@@ -85,7 +65,11 @@ const LocationGuesserView = () => {
     setGameState('results');
   }, [currentLocation]);
 
-  // Content based on game state
+  // Handle going to next location or leaderboard
+  const handleNextLocation = () => {
+    setGameState('leaderboard');
+  };
+
   const renderGameState = () => {
     switch (gameState) {
       case 'viewing':
@@ -96,36 +80,32 @@ const LocationGuesserView = () => {
             onTimeEnd={handleTimeEnd}
           />
         );
-      
       case 'guessing':
         return <GuessingMap onGuessSubmitted={handleGuessSubmitted} />;
-      
       case 'results':
-        if (!guess) return <div>Error: No guess data available.</div>;
-        
-        return (
+        return guess ? (
           <ResultsView
             guess={guess}
             actualLocation={currentLocation}
-            onNextLocation={goToNextLocation}
+            onNextLocation={handleNextLocation}
+            selectedFont={selectedFont}
           />
-        );
-      
+        ) : null;
       case 'leaderboard':
-        return <LeaderboardView />;
-      
+        return <LeaderboardView onNextLocation={handleNextLocation} selectedFont={selectedFont} />;
       default:
-        return <div>Unknown game state.</div>;
+        return null;
     }
   };
 
   return (
-    <div>
-      {/* Game Container */}
-      <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>        
-        {/* Game content based on state */}
-        {renderGameState()}
-      </div>
+    <div style={{ 
+      height: '100vh', 
+      display: 'flex', 
+      flexDirection: 'column',
+      fontFamily: `"${selectedFont}", sans-serif`
+    }}>
+      {renderGameState()}
     </div>
   );
 };
