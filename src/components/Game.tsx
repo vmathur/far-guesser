@@ -4,13 +4,18 @@ import { CSSProperties } from 'react';
 import RulesScreen from './RulesScreen';
 import AutoAuthFrame from './AutoAuthFrame';
 import GoogleFontsLoader from './GoogleFontsLoader';
+import { Location } from './types/LocationGuesserTypes';
 
 // Use dynamic import for the LocationGuesserView component to avoid SSR issues
 const LocationGuesserView = dynamic(() => import('./LocationGuesserView'), {
   ssr: false,
 });
 
-const FarGuesser = () => {
+interface GameProps {
+  dailyLocation: Location;
+}
+
+const FarGuesser = ({ dailyLocation }: GameProps) => {
   const [showRules, setShowRules] = useState(true);
   const selectedFont = 'Comic Sans MS';
   
@@ -42,7 +47,7 @@ const FarGuesser = () => {
         {showRules ? (
           <RulesScreen onPlay={handlePlay} selectedFont={selectedFont} />
         ) : (
-          <LocationGuesserView selectedFont={selectedFont} />
+          <LocationGuesserView selectedFont={selectedFont} dailyLocation={dailyLocation} />
         )}
       </div>
     </>

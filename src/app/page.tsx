@@ -1,5 +1,7 @@
 import { Metadata } from "next";
 import App from "./app";
+import { getDailyLocation } from "../lib/dailyLocation";
+import { locations } from "../data/gameLocations";
 
 const appUrl = process.env.NEXT_PUBLIC_URL;
 
@@ -18,14 +20,15 @@ const frame = {
   },
 };
 
-export const revalidate = 300;
+// Set revalidation time to 1 day (in seconds)
+export const revalidate = 86400;
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "FarGuesser",
     openGraph: {
       title: "FarGuesser",
-      description: "Guess the location",
+      description: "Guess the daily location",
     },
     other: {
       "fc:frame": JSON.stringify(frame),
@@ -33,6 +36,16 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function Home() {
-  return (<App />);
+export default async function Home() {
+  // Get today's location
+  let dailyLocation;
+  try {
+    dailyLocation = await getDailyLocation();
+  } catch (error) {
+    console.error("Error fetching daily location:", error);
+    // Fallback to the first location in the list if there's an error
+    dailyLocation = locations[0];
+  }
+
+  return (<App dailyLocation={dailyLocation} />);
 }

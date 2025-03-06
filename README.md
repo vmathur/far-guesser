@@ -1129,3 +1129,54 @@ We've build a simple v2 frame by:
 5. Connecting to the user's wallet using Wagmi and `sdk.wallet.ethProvider`
 
 Happy Framesgiving! 🖼️🦃
+
+## Daily Game Feature
+
+FarGuesser now includes a daily game mode where all players see the same location. This works as follows:
+
+- All players worldwide see the same location
+- The location progresses sequentially through the list when updated
+- Each update advances to the next location automatically
+
+### Sequential Location System
+
+The location system is designed to be simple and predictable:
+
+1. **Sequential Progression**:
+   - Each time the location update API is called, it automatically advances to the next location
+   - Locations progress in the same order they appear in the code
+   - When reaching the end of the list, it wraps around to the beginning
+
+2. **Automatic Daily Updates**:
+   - A cron job runs daily at midnight UTC to advance to the next location
+   - This ensures a new location each day in a predictable sequence
+
+3. **Manual Trigger**:
+   - To immediately advance to the next location, simply call:
+   ```
+   curl "https://your-app.vercel.app/api/daily-location?secret=YOUR_CRON_SECRET"
+   ```
+   - This increments to the next location in the sequence
+
+### Available Locations
+
+Locations are defined in `src/data/gameLocations.ts` and progress in the order they appear:
+
+```typescript
+export const gameLocations = [
+  { position: {...}, answer: 'Singapore', hint: 'Marina Bay' },     // First in sequence
+  { position: {...}, answer: 'New York', hint: 'Times Square' },    // Second in sequence
+  { position: {...}, answer: 'Paris', hint: 'Near Eiffel Tower' },  // Third in sequence
+  { position: {...}, answer: 'London', hint: 'Near Hyde Park' },    // Fourth in sequence
+  // ... and so on
+];
+```
+
+The sequence of locations follows the exact order in this array. To add new locations, simply add them to this array and redeploy your application.
+
+### Technical Implementation
+
+- The current location index is stored in Vercel KV storage
+- Each API call increments this index to the next location
+- The cron job triggers this progression daily
+- The location is fetched server-side during page load

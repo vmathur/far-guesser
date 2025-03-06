@@ -3,7 +3,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { GameState, Guess, Location } from './types/LocationGuesserTypes';
 import { calculateDistance } from './utils/GoogleMapsUtil';
-import { locations } from '../data/locations';
 import StreetView from './StreetView';
 import GuessingMap from './GuessingMap';
 import ResultsView from './ResultsView';
@@ -11,18 +10,14 @@ import LeaderboardView from './LeaderboardView';
 
 interface LocationGuesserViewProps {
   selectedFont: string;
+  dailyLocation: Location;
 }
 
-const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({ selectedFont }) => {
+const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({ selectedFont, dailyLocation }) => {
   const [timeLeft, setTimeLeft] = useState(10000); // In milliseconds (10 seconds)
   const [gameState, setGameState] = useState<GameState>('viewing');
   const [guess, setGuess] = useState<Guess | null>(null);
   
-  // Select a random location on component mount
-  const [currentLocation, setCurrentLocation] = useState<Location>(() => {
-    return locations[Math.floor(Math.random() * locations.length)];
-  });
-
   // Timer effect - updates the timer in viewing state
   useEffect(() => {
     let timerId: NodeJS.Timeout | undefined;
@@ -51,8 +46,8 @@ const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({ selectedFont 
     const distance = calculateDistance(
       submittedGuess.position.lat, 
       submittedGuess.position.lng, 
-      currentLocation.position.lat,
-      currentLocation.position.lng
+      dailyLocation.position.lat,
+      dailyLocation.position.lng
     );
     
     // Create a new guess with the calculated distance
@@ -63,7 +58,7 @@ const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({ selectedFont 
     
     setGuess(guessWithDistance);
     setGameState('results');
-  }, [currentLocation]);
+  }, [dailyLocation]);
 
   // Handle going to next location or leaderboard
   const handleNextLocation = () => {
@@ -75,7 +70,7 @@ const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({ selectedFont 
       case 'viewing':
         return (
           <StreetView
-            currentLocation={currentLocation}
+            currentLocation={dailyLocation}
             timeLeft={timeLeft}
             onTimeEnd={handleTimeEnd}
           />
@@ -86,7 +81,7 @@ const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({ selectedFont 
         return guess ? (
           <ResultsView
             guess={guess}
-            actualLocation={currentLocation}
+            actualLocation={dailyLocation}
             onNextLocation={handleNextLocation}
             selectedFont={selectedFont}
           />
@@ -99,12 +94,7 @@ const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({ selectedFont 
   };
 
   return (
-    <div style={{ 
-      height: '100vh', 
-      display: 'flex', 
-      flexDirection: 'column',
-      fontFamily: `"${selectedFont}", sans-serif`
-    }}>
+    <div className="game-container">
       {renderGameState()}
     </div>
   );
