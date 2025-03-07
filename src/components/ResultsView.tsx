@@ -3,12 +3,39 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Guess, Location } from './types/LocationGuesserTypes';
 import { useGoogleMapsLoader } from './utils/GoogleMapsUtil';
+import { useSession } from 'next-auth/react';
+import sdk from '@farcaster/frame-sdk';
 
 interface ResultsViewProps {
   guess: Guess;
   actualLocation: Location;
   onNextLocation: () => void;
   selectedFont?: string;
+}
+
+// Define a type for the SDK context
+type FrameSDKContext = {
+  user?: {
+    fid?: number;
+    username?: string;
+    displayName?: string;
+  };
+  frames?: {
+    frameUrl?: string;
+    castId?: {
+      fid?: number;
+      hash?: string;
+    };
+  };
+}
+
+// Define a type for the session update event
+interface SessionUpdateEvent extends CustomEvent {
+  detail: {
+    session: any;
+    status: string;
+    sdkContext?: FrameSDKContext;
+  };
 }
 
 const ResultsView: React.FC<ResultsViewProps> = ({ 
@@ -21,8 +48,105 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   const googleMapRef = useRef<google.maps.Map | null>(null);
   const [loading, setLoading] = useState(true);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const { data: session, status: authStatus } = useSession();
+  const [playRecorded, setPlayRecorded] = useState(false);
+  const [debugMessage, setDebugMessage] = useState<string>('');
+  // Track session from our custom event as a fallback
+  const [customSessionData, setCustomSessionData] = useState<any>(null);
+  const [customAuthStatus, setCustomAuthStatus] = useState<string>('loading');
+  // Track SDK context
+  const [sdkContext, setSdkContext] = useState<FrameSDKContext | null>(null);
   
   const loadGoogleMapsAPI = useGoogleMapsLoader(setLoading);
+  
+  // Load SDK context directly
+  useEffect(() => {
+    const loadSdkContext = async () => {
+      try {
+        if (sdk) {
+          const context = await sdk.context;
+          console.log('ResultsView loaded SDK Context:', context);
+          setSdkContext(context);
+        }
+      } catch (error) {
+        console.error('Error loading SDK context:', error);
+      }
+    };
+    
+    loadSdkContext();
+  }, []);
+  
+  // Listen for custom session update events
+  useEffect(() => {
+    const handleSessionUpdate = (event: SessionUpdateEvent) => {
+      console.log('ResultsView received session update:', event.detail);
+      setCustomSessionData(event.detail.session);
+      setCustomAuthStatus(event.detail.status);
+      if (event.detail.sdkContext) {
+        setSdkContext(event.detail.sdkContext);
+      }
+    };
+    
+    if (typeof window !== 'undefined') {
+      window.addEventListener('farGuesserSessionUpdate', handleSessionUpdate as EventListener);
+      
+      return () => {
+        window.removeEventListener('farGuesserSessionUpdate', handleSessionUpdate as EventListener);
+      };
+    }
+  }, []);
+  
+  // Get FID from SDK context first, then fall back to session
+  const userFid = sdkContext?.user?.fid || 
+                 session?.user?.fid || 
+                 customSessionData?.user?.fid;
+
+  // Record that the user has played
+  useEffect(() => {
+    // Prevent multiple recording attempts
+    if (playRecorded) return;
+    
+    const recordPlay = async () => {
+      // Only proceed if we have a user FID
+      if (!userFid) {
+        setDebugMessage('Waiting for user FID...');
+        return;
+      }
+      
+      setDebugMessage(`Using FID: ${userFid}, recording play...`);
+      
+      try {
+        // Log the request for debugging
+        console.log(`Recording play for FID: ${userFid}`);
+        
+        const response = await fetch('/api/record-play', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Farcaster-User-FID': userFid.toString()
+          },
+          body: JSON.stringify({ fid: userFid }),
+        });
+        
+        console.log('Record play API response status:', response.status);
+        
+        const data = await response.json();
+        console.log('Record play API response data:', data);
+        
+        if (data.success) {
+          setPlayRecorded(true);
+          setDebugMessage(`Play recorded successfully for FID: ${userFid}`);
+        } else {
+          setDebugMessage(`API responded with error: ${data.error || 'Unknown error'}`);
+        }
+      } catch (error) {
+        console.error('Error recording play:', error);
+        setDebugMessage(`Error recording play: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    };
+    
+    recordPlay();
+  }, [userFid, playRecorded]);
 
   // Initialize the results map
   useEffect(() => {
@@ -153,6 +277,21 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     onNextLocation();
   };
 
+  // Add debug info to the results view
+  const debugStyles = {
+    debugInfo: {
+      marginTop: '12px',
+      padding: '8px',
+      fontSize: '0.8em',
+      color: '#666',
+      backgroundColor: '#f5f5f5',
+      borderRadius: '4px',
+      textAlign: 'left' as const,
+      whiteSpace: 'pre-wrap',
+      display: process.env.NODE_ENV === 'development' ? 'block' : 'none',
+    }
+  };
+
   return (
     <div style={{ 
       textAlign: 'center',
@@ -262,6 +401,21 @@ const ResultsView: React.FC<ResultsViewProps> = ({
         >
           Next Location
         </button>
+      )}
+      
+      {/* Add debug info shown only in development */}
+      {process.env.NODE_ENV === 'development' && (
+        <div style={debugStyles.debugInfo}>
+          <p>ResultsView Debug Info:</p>
+          <p>NextAuth Status: {authStatus}</p>
+          <p>Custom Auth Status: {customAuthStatus}</p>
+          <p>SDK User FID: {sdkContext?.user?.fid || 'Not available'}</p>
+          <p>NextAuth User FID: {session?.user?.fid || 'Not authenticated'}</p>
+          <p>Custom User FID: {customSessionData?.user?.fid || 'Not authenticated'}</p>
+          <p>Effective User FID: {userFid || 'Not available'}</p>
+          <p>Play Recorded: {playRecorded.toString()}</p>
+          <p>Debug Message: {debugMessage}</p>
+        </div>
       )}
     </div>
   );

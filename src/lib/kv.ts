@@ -103,3 +103,48 @@ export async function submitScore(entry: LeaderboardEntry): Promise<void> {
   // Store back in KV
   await redis.set(getLeaderboardKey(), topScores);
 }
+
+// User round play tracking functions
+function getUserRoundPlayKey(fid: number): string {
+  return `far-guesser:user-play:${fid}`;
+}
+
+export async function recordUserPlay(fid: number): Promise<void> {
+  await redis.set(getUserRoundPlayKey(fid), Date.now());
+}
+
+export async function hasUserPlayedCurrentRound(fid: number): Promise<boolean> {
+  const lastPlayed = await redis.get<number>(getUserRoundPlayKey(fid));
+  if (!lastPlayed) return false;
+  
+  const lastRoundUpdate = await getLastRoundUpdateTime();
+  // User has played if their last play timestamp is after the last round update
+  return lastPlayed > lastRoundUpdate;
+}
+
+// Round timing functions
+export async function getLastRoundUpdateTime(): Promise<number> {
+  const lastUpdate = await redis.get<string>(LOCATION_UPDATED_KEY);
+  if (!lastUpdate) return 0;
+  return new Date(lastUpdate).getTime();
+}
+
+// Constants
+export const LOCATION_INDEX_KEY = 'current-location-index';
+export const LOCATION_UPDATED_KEY = 'location-last-updated';
+
+// Round duration in milliseconds
+// Can be configured via ROUND_DURATION_MINUTES environment variable (default: 1440 minutes = 24 hours)
+export const ROUND_DURATION_MS = 
+  (parseInt(process.env.ROUND_DURATION_MINUTES || '1440', 10) * 60 * 1000);
+
+export async function getTimeUntilNextRound(): Promise<number> {
+  const lastUpdate = await getLastRoundUpdateTime();
+  if (lastUpdate === 0) return 0;
+  
+  // Calculate time until next round using configurable duration
+  const nextRound = lastUpdate + ROUND_DURATION_MS;
+  const now = Date.now();
+  
+  return Math.max(0, nextRound - now);
+}

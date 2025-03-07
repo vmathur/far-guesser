@@ -2,12 +2,13 @@ import { NextResponse } from 'next/server';
 import { getLocationByIndex, gameLocations } from '../../../data/gameLocations';
 import { kv } from '@vercel/kv';
 import { sendNotificationToAllSubscribers } from '../../../lib/notifs';
+import { LOCATION_INDEX_KEY, LOCATION_UPDATED_KEY } from '../../../lib/kv';
 
 // Key for storing the current location index
-const LOCATION_INDEX_KEY = 'current-location-index';
+// const LOCATION_INDEX_KEY = 'current-location-index';
 
 // Key for storing when the location was last updated
-const LOCATION_UPDATED_KEY = 'location-last-updated';
+// const LOCATION_UPDATED_KEY = 'location-last-updated';
 
 export async function GET(request: Request) {
   // Parse URL to get query parameters
