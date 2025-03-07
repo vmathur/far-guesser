@@ -1,5 +1,6 @@
 import { FrameNotificationDetails } from "@farcaster/frame-sdk";
 import { Redis } from "@upstash/redis";
+import { ROUND_DURATION_MS } from './gameConfig';
 
 const redis = new Redis({
   url: process.env.KV_REST_API_URL,
@@ -133,10 +134,7 @@ export async function getLastRoundUpdateTime(): Promise<number> {
 export const LOCATION_INDEX_KEY = 'current-location-index';
 export const LOCATION_UPDATED_KEY = 'location-last-updated';
 
-// Round duration in milliseconds
-// Can be configured via ROUND_DURATION_MINUTES environment variable (default: 1440 minutes = 24 hours)
-export const ROUND_DURATION_MS = 
-  (parseInt(process.env.ROUND_DURATION_MINUTES || '1440', 10) * 60 * 1000);
+// Round duration is now imported from gameConfig.ts
 
 export async function getTimeUntilNextRound(): Promise<number> {
   const lastUpdate = await getLastRoundUpdateTime();

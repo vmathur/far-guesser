@@ -36,13 +36,19 @@ To try your app in the Warpcast playground, you'll want to use a tunneling tool 
 
 The app uses the following environment variables for configuration:
 
-- `ROUND_DURATION_MINUTES`: The duration of each game round in minutes (default: 1440 = 24 hours). Users can only play once per round. Examples: 5 = 5 minutes, 60 = 1 hour.
 - `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`: Required for Street View and Map components
 - `KV_REST_API_TOKEN` and `KV_REST_API_URL`: For Vercel KV database connections
 - `CRON_SECRET`: Secret for the cron job that updates the daily location
 - `NEXTAUTH_URL` and `NEXTAUTH_SECRET`: For NextAuth authentication
 
 Copy `.env.local.example` to `.env.local` and update the values as needed.
+
+### Game Configuration
+
+Game settings are configured in `src/lib/gameConfig.ts`:
+
+- `ROUND_DURATION_MINUTES`: The duration of each game round in minutes (default: 360 = 6 hours). Users can only play once per round. Examples: 5 = 5 minutes, 60 = 1 hour, 1440 = 24 hours (1 day).
+- Additional game settings can be added to this file as needed.
 
 ## Tutorial
 
