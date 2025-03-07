@@ -78,11 +78,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({
             fillOpacity: 0.8,
             strokeWeight: 2,
             strokeColor: "#FFFFFF"
-          },
-          label: {
-            text: "Your Guess",
-            color: "#FFFFFF",
-            fontWeight: "bold"
           }
         });
         
@@ -96,12 +91,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
             fillColor: "#00FF00",
             fillOpacity: 0.8,
             strokeWeight: 2,
-            strokeColor: "#FFFFFF"
-          },
-          label: {
-            text: "Actual Location: " + actualLocation.answer,
-            color: "#FFFFFF",
-            fontWeight: "bold"
+            strokeColor: "#000000"
           }
         });
         

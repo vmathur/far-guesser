@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
         await sendFrameNotification({
           fid,
           title: "Welcome to FarGuesser",
-          body: "FarGuesser is now added to your client",
+          body: "Start playing now!",
         });
       } else {
         await deleteUserNotificationDetails(fid);

@@ -63,3 +63,89 @@ export async function sendFrameNotification({
     return { state: "error", error: responseJson };
   }
 }
+
+/**
+ * Sends a notification to all users who have subscribed
+ * @param title The notification title
+ * @param body The notification body
+ * @returns Array of results from notification attempts
+ */
+export async function sendNotificationToAllSubscribers(
+  title: string,
+  body: string
+): Promise<{
+  totalUsers: number,
+  successCount: number,
+  failedCount: number,
+  rateLimitedCount: number,
+  noTokenCount: number
+}> {
+  try {
+    // Import dynamically to avoid circular dependencies
+    const { getAllSubscribedUserFids } = await import('~/lib/kv');
+    
+    // Get all subscribed user FIDs
+    const userFids = await getAllSubscribedUserFids();
+    console.log(`Found ${userFids.length} subscribed users`);
+    
+    // Track results
+    let successCount = 0;
+    let failedCount = 0;
+    let rateLimitedCount = 0;
+    let noTokenCount = 0;
+    
+    // If no users found, return early
+    if (userFids.length === 0) {
+      return {
+        totalUsers: 0,
+        successCount,
+        failedCount,
+        rateLimitedCount,
+        noTokenCount
+      };
+    }
+    
+    // Send notification to each user
+    await Promise.all(
+      userFids.map(async (fid) => {
+        try {
+          const result = await sendFrameNotification({
+            fid,
+            title,
+            body,
+          });
+          
+          // Track result
+          switch (result.state) {
+            case "success":
+              successCount++;
+              break;
+            case "error":
+              failedCount++;
+              break;
+            case "rate_limit":
+              rateLimitedCount++;
+              break;
+            case "no_token":
+              noTokenCount++;
+              break;
+          }
+        } catch (error) {
+          console.error(`Error sending notification to user ${fid}:`, error);
+          failedCount++;
+        }
+      })
+    );
+    
+    return {
+      totalUsers: userFids.length,
+      successCount,
+      failedCount,
+      rateLimitedCount,
+      noTokenCount
+    };
+  } catch (error) {
+    console.error('Error in sendNotificationToAllSubscribers:', error);
+    throw error; // Re-throw to allow caller to handle
+  }
+}

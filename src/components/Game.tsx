@@ -17,7 +17,7 @@ interface GameProps {
 
 const FarGuesser = ({ dailyLocation }: GameProps) => {
   const [showRules, setShowRules] = useState(true);
-  const selectedFont = 'Comic Sans MS';
+  const selectedFont = 'Arial';
   
   const styles: Record<string, CSSProperties> = {
     container: {
