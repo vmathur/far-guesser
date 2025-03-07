@@ -47,6 +47,116 @@ export const gameLocations: GameLocation[] = [
     answer: 'Sydney', 
     hint: 'Near Sydney Opera House' 
   },
+  { 
+    position: { lat: 41.8902, lng: 12.4922 }, 
+    answer: 'Rome', 
+    hint: 'Colosseum' 
+  },
+  { 
+    position: { lat: 25.1972, lng: 55.2744 }, 
+    answer: 'Dubai', 
+    hint: 'Burj Khalifa' 
+  },
+  { 
+    position: { lat: 40.4168, lng: -3.7038 }, 
+    answer: 'Madrid', 
+    hint: 'Plaza Mayor' 
+  },
+  { 
+    position: { lat: 52.5200, lng: 13.4050 }, 
+    answer: 'Berlin', 
+    hint: 'Brandenburg Gate' 
+  },
+  { 
+    position: { lat: 55.7558, lng: 37.6173 }, 
+    answer: 'Moscow', 
+    hint: 'Red Square' 
+  },
+  { 
+    position: { lat: -22.9068, lng: -43.1729 }, 
+    answer: 'Rio de Janeiro', 
+    hint: 'Christ the Redeemer' 
+  },
+  { 
+    position: { lat: 30.0444, lng: 31.2357 }, 
+    answer: 'Cairo', 
+    hint: 'Near the Pyramids' 
+  },
+  { 
+    position: { lat: 13.7563, lng: 100.5018 }, 
+    answer: 'Bangkok', 
+    hint: 'Grand Palace' 
+  },
+  { 
+    position: { lat: 45.4215, lng: -75.6972 }, 
+    answer: 'Ottawa', 
+    hint: 'Parliament Hill' 
+  },
+  { 
+    position: { lat: -34.6037, lng: -58.3816 }, 
+    answer: 'Buenos Aires', 
+    hint: 'Plaza de Mayo' 
+  },
+  { 
+    position: { lat: 59.3293, lng: 18.0686 }, 
+    answer: 'Stockholm', 
+    hint: 'Gamla Stan' 
+  },
+  { 
+    position: { lat: 37.9838, lng: 23.7275 }, 
+    answer: 'Athens', 
+    hint: 'Acropolis' 
+  },
+  { 
+    position: { lat: 41.0082, lng: 28.9784 }, 
+    answer: 'Istanbul', 
+    hint: 'Hagia Sophia' 
+  },
+  { 
+    position: { lat: 19.4326, lng: -99.1332 }, 
+    answer: 'Mexico City', 
+    hint: 'Zócalo' 
+  },
+  { 
+    position: { lat: 31.2304, lng: 121.4737 }, 
+    answer: 'Shanghai', 
+    hint: 'The Bund' 
+  },
+  { 
+    position: { lat: 43.7696, lng: 11.2558 }, 
+    answer: 'Florence', 
+    hint: 'Duomo' 
+  },
+  { 
+    position: { lat: 45.4408, lng: 12.3155 }, 
+    answer: 'Venice', 
+    hint: 'Grand Canal' 
+  },
+  { 
+    position: { lat: 48.2082, lng: 16.3738 }, 
+    answer: 'Vienna', 
+    hint: 'Schönbrunn Palace' 
+  },
+  { 
+    position: { lat: 50.0755, lng: 14.4378 }, 
+    answer: 'Prague', 
+    hint: 'Charles Bridge' 
+  },
+  { 
+    position: { lat: 33.8688, lng: 151.2093 }, 
+    answer: 'Sydney', 
+    hint: 'Harbour Bridge' 
+  },
+  { 
+    position: { lat: 22.3193, lng: 114.1694 }, 
+    answer: 'Hong Kong', 
+    hint: 'Victoria Harbour' 
+  },
+  { 
+    position: { lat: 1.3521, lng: 103.8198 }, 
+    answer: 'Singapore', 
+    hint: 'Gardens by the Bay' 
+  },
 ];
 
 /**
