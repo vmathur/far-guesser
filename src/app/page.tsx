@@ -9,7 +9,7 @@ const frame = {
   version: "next",
   imageUrl: `${appUrl}/opengraph-image`,
   button: {
-    title: "Launch Frame",
+    title: "Play",
     action: {
       type: "launch_frame",
       name: "FarGuesser",

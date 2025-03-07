@@ -2,6 +2,15 @@
 
 FarGuesser.
 
+TODO
+- Fonts
+- Daily/Global leaderboards
+- Share button working
+- Better frame image
+- Analytics
+- add reset endpoint
+- Testing
+
 ## Getting Started
 
 This is a [NextJS](https://nextjs.org/) + TypeScript + React app.
@@ -20,7 +29,9 @@ $ yarn dev
 
 To try your app in the Warpcast playground, you'll want to use a tunneling tool like [ngrok](https://ngrok.com/).
 
+
 ## Configuration
+
 
 ### Environment Variables
 

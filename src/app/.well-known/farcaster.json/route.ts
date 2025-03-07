@@ -15,7 +15,7 @@ export async function GET() {
       iconUrl: `${appUrl}icon.png`,
       homeUrl: `${appUrl}`,
       imageUrl: `${appUrl}icon.png`,
-      buttonTitle: "Launch Frame",
+      buttonTitle: "Play",
       splashImageUrl: `${appUrl}splash.png`,
       splashBackgroundColor: "#f7f7f7",
       webhookUrl: `${appUrl}api/webhook`,
