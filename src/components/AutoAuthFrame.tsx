@@ -220,7 +220,7 @@ export default function AutoAuthFrame() {
         
         // Auto sign in after initialization
         if (status !== "authenticated") {
-          // await autoSignIn();
+          await autoSignIn();
         }
       } catch (error) {
         console.error("SDK initialization error:", error);
@@ -242,12 +242,12 @@ export default function AutoAuthFrame() {
 
   // Try to add the frame if not added
   useEffect(() => {
-    if (!isFrameAdded) {
-      autoAddFrame();
-    }
-    // if (status === "authenticated" && !isFrameAdded) {
+    // if (!isFrameAdded) {
     //   autoAddFrame();
     // }
+    if (status === "authenticated" && !isFrameAdded) {
+      autoAddFrame();
+    }
   }, [status, isFrameAdded, autoAddFrame]);
 
   // For debugging, log when the component mounts and unmounts
