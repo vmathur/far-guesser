@@ -3,13 +3,12 @@
 FarGuesser.
 
 TODO
-- Fonts
+- Remove need for sign in
 - Daily/Global leaderboards
 - Share button working
 - Better frame image
+- Fonts update
 - Analytics
-- add reset endpoint
-- Testing
 
 ## Getting Started
 
