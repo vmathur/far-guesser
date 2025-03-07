@@ -2,9 +2,6 @@ import { NextResponse } from 'next/server';
 import { getLocationByIndex, gameLocations } from '../../../data/gameLocations';
 import { kv } from '@vercel/kv';
 
-// Secret to verify the cron job request
-const CRON_SECRET = process.env.CRON_SECRET;
-
 // Key for storing the current location index
 const LOCATION_INDEX_KEY = 'current-location-index';
 
@@ -13,11 +10,11 @@ const LOCATION_UPDATED_KEY = 'location-last-updated';
 
 export async function GET(request: Request) {
   // Verify the request is from our cron job or admin
-  const { searchParams } = new URL(request.url);
-  const secret = searchParams.get('secret');
-  
-  if (secret !== CRON_SECRET) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const authHeader = request.headers.get('authorization');
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return new Response('Unauthorized', {
+      status: 401,
+    });
   }
 
   try {
