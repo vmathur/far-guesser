@@ -1,9 +1,8 @@
 import React from 'react';
-import Head from 'next/head';
 
+// This component is now redundant since we're using Next.js built-in font system
+// Keep this component to avoid breaking changes in the codebase
 const GoogleFontsLoader = () => {
-  // Comic Sans MS is a system font, so we don't need to load any Google Fonts
-  // Keeping this component in case we need to add fonts in the future
   return null;
 };
 
