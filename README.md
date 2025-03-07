@@ -5,7 +5,6 @@ FarGuesser.
 TODO
 - Remove need for sign in
 - Daily/Global leaderboards
-- Share button working
 - Better frame image
 - Fonts update
 - Analytics
