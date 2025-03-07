@@ -5,9 +5,12 @@ FarGuesser.
 TODO
 - Remove need for sign in
 - Daily/Global leaderboards
-- Better frame image
-- Fonts update
-- Analytics
+- Draw a good frame image
+- Add analytics
+
+Tweaks
+- Optimal game length? (prolly 20 seconds)
+- Change to daily cadence
 
 ## Getting Started
 

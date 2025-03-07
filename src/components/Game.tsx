@@ -25,7 +25,6 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
       padding: '20px',
       backgroundColor: '#ffffff',
       borderRadius: '8px',
-      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
       maxWidth: '800px',
       margin: '0 auto',
     },

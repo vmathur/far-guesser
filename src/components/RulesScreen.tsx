@@ -187,7 +187,6 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
       padding: '30px',
       backgroundColor: '#ffffff',
       borderRadius: '12px',
-      boxShadow: '0 6px 12px rgba(0, 0, 0, 0.15)',
       maxWidth: '800px',
       margin: '0 auto',
     },
@@ -202,15 +201,13 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
     rulesContainer: {
       textAlign: 'left',
       backgroundColor: 'white',
-      padding: '25px',
       borderRadius: '10px',
       marginBottom: '30px',
-      border: '2px dashed #4CAF50',
     },
     rule: {
       position: 'relative' as const,
       backgroundColor: 'white',
-      padding: '15px 15px 15px 35px',
+      padding: '15px 15px 15px 15px',
       margin: '10px 0',
       borderRadius: '10px',
       fontFamily: `"${selectedFont}", "Comic Sans MS", cursive`,
@@ -230,13 +227,13 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
       fontWeight: 'bold',
       transition: 'all 0.3s',
       fontFamily: `"${selectedFont}", "Comic Sans MS", cursive`,
-      boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
       transform: 'scale(1)',
     },
     emoji: {
       position: 'absolute',
       left: '0',
       fontSize: '1.4em',
+      marginLeft: '10px',
     },
     fontInfo: {
       marginTop: '10px',
@@ -287,17 +284,17 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>FarGuesser</h1>
+      <h1 style={styles.title}>📌 FarGuesser</h1>
       
       <div style={styles.rulesContainer}>
         <p style={styles.rule}>
-          1. Explore a location for 10 seconds
+          1. Explore a mystery location for 10 seconds
         </p>
         <p style={styles.rule}>
-          2. Guess the location on the map
+          2. Guess where it is on the map
         </p>
         <p style={styles.rule}>
-          3. Score points for being closer to the actual location. New locations each day
+          3. Score points for being close to the actual location. New location each day
         </p>
       </div>
       
