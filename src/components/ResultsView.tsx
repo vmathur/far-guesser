@@ -268,8 +268,13 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   }, [actualLocation, guess, loadGoogleMapsAPI]);
 
   const handleShare = () => {
-    // In a real app, would implement sharing functionality here
-    alert('Sharing functionality would go here');
+    const message = `I scored ${guess.distance.toLocaleString()} km away from today's mystery location 📍. Can you beat me?\n\n`;
+    // URL encode the message, ensuring newlines are properly encoded
+    const encodedMessage = encodeURIComponent(message);
+    const encodedFrameUrl = encodeURIComponent(process.env.NEXT_PUBLIC_URL);
+
+    // Use the Farcaster SDK to open the Warpcast compose page
+    sdk.actions.openUrl(`https://warpcast.com/~/compose?text=${encodedMessage}&embeds[]=${encodedFrameUrl}`);
   };
 
   const handleShowLeaderboard = () => {
@@ -403,20 +408,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({
         </button>
       )}
       
-      {/* Add debug info shown only in development */}
-      {process.env.NODE_ENV === 'development' && (
-        <div style={debugStyles.debugInfo}>
-          <p>ResultsView Debug Info:</p>
-          <p>NextAuth Status: {authStatus}</p>
-          <p>Custom Auth Status: {customAuthStatus}</p>
-          <p>SDK User FID: {sdkContext?.user?.fid || 'Not available'}</p>
-          <p>NextAuth User FID: {session?.user?.fid || 'Not authenticated'}</p>
-          <p>Custom User FID: {customSessionData?.user?.fid || 'Not authenticated'}</p>
-          <p>Effective User FID: {userFid || 'Not available'}</p>
-          <p>Play Recorded: {playRecorded.toString()}</p>
-          <p>Debug Message: {debugMessage}</p>
-        </div>
-      )}
     </div>
   );
 };

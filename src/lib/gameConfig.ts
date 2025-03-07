@@ -11,6 +11,16 @@ export const gameConfig = {
    */
   ROUND_DURATION_MINUTES: 60,
   
+  /**
+   * Time in milliseconds that a player can view the street view
+   * before they need to make a guess
+   * Examples:
+   * - 10000 = 10 seconds
+   * - 30000 = 30 seconds
+   * - 60000 = 1 minute
+   */
+  VIEWING_TIME_MS: 10000,
+  
   // Add other game configuration parameters here as needed
 };
 

@@ -7,6 +7,7 @@ import StreetView from './StreetView';
 import GuessingMap from './GuessingMap';
 import ResultsView from './ResultsView';
 import LeaderboardView from './LeaderboardView';
+import { gameConfig } from '../lib/gameConfig';
 
 interface LocationGuesserViewProps {
   selectedFont: string;
@@ -14,7 +15,7 @@ interface LocationGuesserViewProps {
 }
 
 const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({ selectedFont, dailyLocation }) => {
-  const [timeLeft, setTimeLeft] = useState(10000); // In milliseconds (10 seconds)
+  const [timeLeft, setTimeLeft] = useState(gameConfig.VIEWING_TIME_MS); // Use the configured time
   const [gameState, setGameState] = useState<GameState>('viewing');
   const [guess, setGuess] = useState<Guess | null>(null);
   
