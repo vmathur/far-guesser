@@ -245,6 +245,7 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
       fontSize: '1.2em',
       color: '#666',
       fontFamily: `"${selectedFont}", "Comic Sans MS", cursive`,
+      whiteSpace: 'nowrap',
     },
     loadingIndicator: {
       marginTop: '20px',
@@ -288,7 +289,7 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
       
       <div style={styles.rulesContainer}>
         <p style={styles.rule}>
-          1. Explore a mystery location for 10 seconds
+          1. Explore a mystery location for 15 seconds
         </p>
         <p style={styles.rule}>
           2. Guess where it is on the map

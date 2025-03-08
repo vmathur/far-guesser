@@ -3,6 +3,7 @@
 FarGuesser.
 
 TODO
+- Fix bug where deploying resets cron
 - Daily/Global leaderboards
 - Draw a good frame image
 - Add analytics

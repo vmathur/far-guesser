@@ -120,6 +120,7 @@ const StreetView: React.FC<StreetViewProps> = ({
         transform: timeLeft < 3000 ? 'scale(1.1)' : 'scale(1)',
         width: '160px',
         textAlign: 'center',
+        whiteSpace: 'nowrap',
       }}>
         {(timeLeft / 1000).toFixed(2) +' s'}
       </div>
