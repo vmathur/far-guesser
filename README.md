@@ -6,7 +6,6 @@ TODO
 - Fix bug where deploying resets cron
 - Daily/Global leaderboards
 - Draw a good frame image
-- Add analytics
 
 Tweaks
 - Optimal game length? (prolly 20 seconds)

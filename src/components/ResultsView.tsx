@@ -145,7 +145,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     };
     
     recordPlay();
-  }, [playRecorded]);
+  }, [playRecorded, sdkContext, customSessionData]);
 
   // Initialize the results map
   useEffect(() => {

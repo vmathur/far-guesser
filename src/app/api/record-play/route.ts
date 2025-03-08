@@ -6,7 +6,10 @@ import { authOptions } from '../../../auth';
 
 // Schema for validation
 const recordPlaySchema = z.object({
-  fid: z.number(),
+  fid: z.union([
+    z.number(),
+    z.string().transform(val => parseInt(val, 10))
+  ]),
 });
 
 export async function POST(request: NextRequest) {
@@ -41,6 +44,7 @@ export async function POST(request: NextRequest) {
     }
     
     const result = recordPlaySchema.safeParse(requestJson);
+    console.log('Result:', result);
     
     if (!result.success) {
       console.log('Validation error:', result.error.errors);
