@@ -211,9 +211,9 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
       margin: '10px 0',
       borderRadius: '10px',
       fontFamily: `"${selectedFont}", "Comic Sans MS", cursive`,
-      fontSize: '1.2em',
+      fontSize: '1.4em',
       color: '#444',
-      marginBottom: '15px',
+      marginBottom: '10px',
       lineHeight: '1.5',
     },
     playButton: {
