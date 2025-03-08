@@ -3,8 +3,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Guess, Location } from './types/LocationGuesserTypes';
 import { useGoogleMapsLoader } from './utils/GoogleMapsUtil';
-import { useSession } from 'next-auth/react';
 import sdk from '@farcaster/frame-sdk';
+import { useGameAnalytics } from '../lib/analytics';
 
 interface ResultsViewProps {
   guess: Guess;
@@ -48,16 +48,13 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   const googleMapRef = useRef<google.maps.Map | null>(null);
   const [loading, setLoading] = useState(true);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
-  const { data: session, status: authStatus } = useSession();
   const [playRecorded, setPlayRecorded] = useState(false);
   const [debugMessage, setDebugMessage] = useState<string>('');
-  // Track session from our custom event as a fallback
-  const [customSessionData, setCustomSessionData] = useState<any>(null);
-  const [customAuthStatus, setCustomAuthStatus] = useState<string>('loading');
-  // Track SDK context
   const [sdkContext, setSdkContext] = useState<FrameSDKContext | null>(null);
+  const [customSessionData, setCustomSessionData] = useState<any>(null);
   
   const loadGoogleMapsAPI = useGoogleMapsLoader(setLoading);
+  const analytics = useGameAnalytics();
   
   // Load SDK context directly
   useEffect(() => {
@@ -81,7 +78,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     const handleSessionUpdate = (event: SessionUpdateEvent) => {
       console.log('ResultsView received session update:', event.detail);
       setCustomSessionData(event.detail.session);
-      setCustomAuthStatus(event.detail.status);
       if (event.detail.sdkContext) {
         setSdkContext(event.detail.sdkContext);
       }
@@ -96,11 +92,13 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     }
   }, []);
   
-  // Get FID from SDK context first, then fall back to session
-  const userFid = sdkContext?.user?.fid || 
-                 session?.user?.fid || 
-                 customSessionData?.user?.fid;
-
+  const getUserFid = () => {
+    return (
+      sdkContext?.user?.fid?.toString() || 
+      customSessionData?.user?.fid?.toString()
+    );
+  };
+  
   // Record that the user has played
   useEffect(() => {
     // Prevent multiple recording attempts
@@ -108,6 +106,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     
     const recordPlay = async () => {
       // Only proceed if we have a user FID
+      const userFid = getUserFid();
       if (!userFid) {
         setDebugMessage('Waiting for user FID...');
         return;
@@ -123,7 +122,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Farcaster-User-FID': userFid.toString()
+            'X-Farcaster-User-FID': userFid
           },
           body: JSON.stringify({ fid: userFid }),
         });
@@ -146,7 +145,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     };
     
     recordPlay();
-  }, [userFid, playRecorded]);
+  }, [playRecorded]);
 
   // Initialize the results map
   useEffect(() => {
@@ -268,6 +267,8 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   }, [actualLocation, guess, loadGoogleMapsAPI]);
 
   const handleShare = () => {
+    analytics.shareClicked();
+    
     const message = `I scored ${guess.distance.toLocaleString()} km away from today's mystery location 📍. Can you beat me?\n\n`;
     // URL encode the message, ensuring newlines are properly encoded
     const encodedMessage = encodeURIComponent(message);
@@ -296,6 +297,13 @@ const ResultsView: React.FC<ResultsViewProps> = ({
       display: process.env.NODE_ENV === 'development' ? 'block' : 'none',
     }
   };
+
+  // Track results_viewed event when component mounts
+  useEffect(() => {
+    if (guess?.distance) {
+      analytics.resultsViewed({ distance: guess.distance });
+    }
+  }, [guess, analytics]);
 
   return (
     <div style={{ 

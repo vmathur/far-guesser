@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { LeaderboardEntry } from './types/LocationGuesserTypes';
+import { useGameAnalytics } from '../lib/analytics';
 
 interface LeaderboardViewProps {
   onNextLocation?: () => void;
@@ -14,6 +15,12 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({
 }) => {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const analytics = useGameAnalytics();
+
+  // Track leaderboard_viewed event when component mounts
+  useEffect(() => {
+    analytics.leaderboardViewed();
+  }, [analytics]);
 
   // Fetch leaderboard data
   useEffect(() => {

@@ -3,7 +3,8 @@
 import dynamic from "next/dynamic";
 import type { Session } from "next-auth"
 import { SessionProvider } from "next-auth/react"
-
+import { AnalyticsProvider } from "~/lib/AnalyticsContext";
+import { useEffect } from 'react';
 
 const WagmiProvider = dynamic(
   () => import("~/components/providers/WagmiProvider"),
@@ -16,7 +17,9 @@ export function Providers({ session, children }: { session: Session | null, chil
   return (
     <SessionProvider session={session}>
       <WagmiProvider>
-        {children}
+        <AnalyticsProvider>
+          {children}
+        </AnalyticsProvider>
       </WagmiProvider>
     </SessionProvider>
   );

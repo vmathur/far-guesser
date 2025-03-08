@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import sdk, { FrameNotificationDetails } from "@farcaster/frame-sdk";
 import { useSession } from "next-auth/react";
 import { setUserNotificationDetails } from "~/lib/kv";
+import { useAnalytics } from "~/lib/AnalyticsContext";
 
 // Define the SDK context type based on what's available
 type FrameSDKContext = {
@@ -26,7 +27,7 @@ export const broadcastSessionUpdate = (sessionData: any, sdkContext?: FrameSDKCo
   if (typeof window !== 'undefined') {
     console.log('Broadcasting session update:', sessionData, 'SDK Context:', sdkContext);
     // Create a custom event with the session data and SDK context
-    const event = new CustomEvent('farGuesserSessionUpdate', { 
+    const event = new CustomEvent('session-update', { 
       detail: {
         session: sessionData,
         status: sessionData?.status,
@@ -71,23 +72,24 @@ export default function AutoAuthFrame() {
   const [sdkContext, setSdkContext] = useState<FrameSDKContext | null>(null);
   const [isInFarcaster, setIsInFarcaster] = useState<boolean | null>(null);
   const [showPopup, setShowPopup] = useState(false);
+  const { setFid } = useAnalytics();
 
   // Load SDK context
   useEffect(() => {
-    console.log('Running SDK context loading effect');
-    
     const loadSdkContext = async () => {
       try {
-        console.log('Inside loadSdkContext function');
         if (sdk) {
-          console.log('SDK is available, requesting context');
           const context = await sdk.context;
-          console.log('SDK Context loaded successfully:', context);
           setSdkContext(context);
           
           // Check if we're in Farcaster by looking for user.fid
           const isFarcaster = !!context?.user?.fid;
           setIsInFarcaster(isFarcaster);
+          
+          // Set the FID in the analytics context if available
+          if (context?.user?.fid) {
+            setFid(context.user.fid);
+          }
           
           // Show popup if not in Farcaster after a short delay
           if (!isFarcaster) {
@@ -98,7 +100,6 @@ export default function AutoAuthFrame() {
           broadcastSessionUpdate({ status }, context);
         }
       } catch (error) {
-        console.error('Error loading SDK context:', error);
         // If there's an error loading the SDK context, we're likely not in Farcaster
         setIsInFarcaster(false);
         setTimeout(() => setShowPopup(true), 1000);
@@ -106,7 +107,7 @@ export default function AutoAuthFrame() {
     };
     
     loadSdkContext();
-  }, []);
+  }, [setFid, status]);
 
   // Broadcast session updates whenever the session changes or SDK context is available
   useEffect(() => {
@@ -142,22 +143,14 @@ export default function AutoAuthFrame() {
 
   // Initialize SDK and set up event listeners
   useEffect(() => {
-    console.log('Running SDK initialization effect, isSDKLoaded:', isSDKLoaded);
-    
     const initialize = async () => {
-      console.log('Starting SDK initialization');
       try {
-        console.log('Requesting SDK context');
         const context = await sdk.context;
-        console.log('SDK context received:', context);
-        
         setIsFrameAdded(context.client.added);
         setNotificationDetails(context.client.notificationDetails ?? null);
         
-        console.log('Setting up SDK event listeners');
         // Set up event listeners
         sdk.on("frameAdded", ({ notificationDetails }) => {
-          console.log('Frame added event received');
           setIsFrameAdded(true);
           if (notificationDetails) {
             setNotificationDetails(notificationDetails);
@@ -193,7 +186,6 @@ export default function AutoAuthFrame() {
           setNotificationDetails(null);
         });
         
-        console.log('Calling sdk.actions.ready()');
         // Tell the SDK we're ready
         sdk.actions.ready({});
       } catch (error) {
@@ -202,13 +194,11 @@ export default function AutoAuthFrame() {
     };
 
     if (sdk && !isSDKLoaded) {
-      console.log('SDK available and not yet loaded, starting initialization');
       setIsSDKLoaded(true);
       initialize();
       
       // Cleanup listeners when component unmounts
       return () => {
-        console.log('Cleaning up SDK event listeners');
         sdk.removeAllListeners();
       };
     }
@@ -219,7 +209,7 @@ export default function AutoAuthFrame() {
     if (sdkContext?.user?.fid && !isFrameAdded) {
       autoAddFrame();
     }
-  }, [sdkContext, isFrameAdded, autoAddFrame]);
+  }, [sdkContext, isFrameAdded, autoAddFrame, setFid]);
 
   // For debugging, log when the component mounts and unmounts
   useEffect(() => {

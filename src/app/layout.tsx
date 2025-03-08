@@ -3,6 +3,7 @@ import { Patrick_Hand } from 'next/font/google';
 import { getSession } from "~/auth"
 import "~/app/globals.css";
 import { Providers } from "~/app/providers";
+import { Analytics } from '@vercel/analytics/react';
 
 // Initialize Patrick Hand font
 const patrickHand = Patrick_Hand({
@@ -27,6 +28,7 @@ export default async function RootLayout({
     <html lang="en" className={patrickHand.className}>
       <body>
         <Providers session={session}>{children}</Providers>
+        <Analytics />
       </body>
     </html>
   );

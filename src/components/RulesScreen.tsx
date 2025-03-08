@@ -2,6 +2,7 @@ import { useEffect, useState, FC } from 'react';
 import { CSSProperties } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 import sdk from '@farcaster/frame-sdk';
+import { useGameAnalytics } from '~/lib/analytics';
 
 interface RulesScreenProps {
   onPlay: () => void;
@@ -50,6 +51,7 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
   const [customAuthStatus, setCustomAuthStatus] = useState<string>('loading');
   // Track SDK context
   const [sdkContext, setSdkContext] = useState<FrameSDKContext | null>(null);
+  const analytics = useGameAnalytics();
   
   // Load SDK context directly
   useEffect(() => {
@@ -283,6 +285,13 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
     }
   };
 
+  const handlePlayClick = () => {
+    // Track the game_started event
+    analytics.gameStarted();
+    // Call the original onPlay function
+    onPlay();
+  };
+
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>📌 FarGuesser</h1>
@@ -305,7 +314,7 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
         <>
           <button 
             style={styles.playButton}
-            onClick={playStatus?.hasPlayed ? undefined : onPlay}
+            onClick={playStatus?.hasPlayed ? undefined : handlePlayClick}
             onMouseOver={(e) => {
               if (!playStatus?.hasPlayed) {
                 e.currentTarget.style.backgroundColor = '#45a049';

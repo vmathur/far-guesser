@@ -8,6 +8,7 @@ import GuessingMap from './GuessingMap';
 import ResultsView from './ResultsView';
 import LeaderboardView from './LeaderboardView';
 import { gameConfig } from '../lib/gameConfig';
+import { useGameAnalytics } from '../lib/analytics';
 
 interface LocationGuesserViewProps {
   selectedFont: string;
@@ -18,6 +19,7 @@ const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({ selectedFont,
   const [timeLeft, setTimeLeft] = useState(gameConfig.VIEWING_TIME_MS); // Use the configured time
   const [gameState, setGameState] = useState<GameState>('viewing');
   const [guess, setGuess] = useState<Guess | null>(null);
+  const analytics = useGameAnalytics();
   
   // Timer effect - updates the timer in viewing state
   useEffect(() => {
@@ -28,16 +30,20 @@ const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({ selectedFont,
         setTimeLeft(prev => Math.max(0, prev - 100)); // Decrease by 100ms
       }, 100); // Update every 100ms
     } else if (gameState === 'viewing' && timeLeft === 0) {
+      // Track viewing_completed event when time runs out
+      analytics.viewingCompleted();
       setGameState('guessing');
     }
     
     return () => {
       if (timerId) clearTimeout(timerId);
     };
-  }, [gameState, timeLeft]);
+  }, [gameState, timeLeft, analytics]);
 
   // Handle time running out
   const handleTimeEnd = () => {
+    // Track viewing_completed event when time runs out
+    analytics.viewingCompleted();
     setGameState('guessing');
   };
 
@@ -57,9 +63,12 @@ const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({ selectedFont,
       distance
     };
     
+    // Track guess_submitted event
+    analytics.guessSubmitted({ distance });
+    
     setGuess(guessWithDistance);
     setGameState('results');
-  }, [dailyLocation]);
+  }, [dailyLocation, analytics]);
 
   // Handle going to next location or leaderboard
   const handleNextLocation = () => {

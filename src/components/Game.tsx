@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { CSSProperties } from 'react';
 import RulesScreen from './RulesScreen';
 import AutoAuthFrame from './AutoAuthFrame';
 import GoogleFontsLoader from './GoogleFontsLoader';
 import { Location } from './types/LocationGuesserTypes';
+import { useGameAnalytics } from '~/lib/analytics';
 
 // Use dynamic import for the LocationGuesserView component to avoid SSR issues
 const LocationGuesserView = dynamic(() => import('./LocationGuesserView'), {
@@ -18,6 +19,7 @@ interface GameProps {
 const FarGuesser = ({ dailyLocation }: GameProps) => {
   const [showRules, setShowRules] = useState(true);
   const selectedFont = 'Patrick Hand';
+  const analytics = useGameAnalytics();
   
   const styles: Record<string, CSSProperties> = {
     container: {
@@ -27,8 +29,13 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
       borderRadius: '8px',
       maxWidth: '800px',
       margin: '0 auto',
-    },
+    }
   };
+
+  // Track page view event when component mounts
+  useEffect(() => {
+    analytics.pageView();
+  }, [analytics]);
 
   const handlePlay = () => {
     setShowRules(false);
