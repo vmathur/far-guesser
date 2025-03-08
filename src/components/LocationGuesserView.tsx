@@ -19,13 +19,15 @@ const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({ selectedFont,
   const [timeLeft, setTimeLeft] = useState(gameConfig.VIEWING_TIME_MS); // Use the configured time
   const [gameState, setGameState] = useState<GameState>('viewing');
   const [guess, setGuess] = useState<Guess | null>(null);
+  const [mapLoaded, setMapLoaded] = useState(false); // Add this state
   const analytics = useGameAnalytics();
   
   // Timer effect - updates the timer in viewing state
   useEffect(() => {
     let timerId: NodeJS.Timeout | undefined;
     
-    if (gameState === 'viewing' && timeLeft > 0) {
+    // Only start the timer if the map has loaded
+    if (gameState === 'viewing' && timeLeft > 0 && mapLoaded) {
       timerId = setTimeout(() => {
         setTimeLeft(prev => Math.max(0, prev - 100)); // Decrease by 100ms
       }, 100); // Update every 100ms
@@ -38,7 +40,7 @@ const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({ selectedFont,
     return () => {
       if (timerId) clearTimeout(timerId);
     };
-  }, [gameState, timeLeft, analytics]);
+  }, [gameState, timeLeft, analytics, mapLoaded]); // Add mapLoaded to dependencies
 
   // Handle time running out
   const handleTimeEnd = () => {
@@ -46,6 +48,11 @@ const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({ selectedFont,
     analytics.viewingCompleted();
     setGameState('guessing');
   };
+
+  // Handle map loaded event
+  const handleMapLoaded = useCallback(() => {
+    setMapLoaded(true);
+  }, []);
 
   // Handle guess submission
   const handleGuessSubmitted = useCallback((submittedGuess: Guess) => {
@@ -83,6 +90,7 @@ const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({ selectedFont,
             currentLocation={dailyLocation}
             timeLeft={timeLeft}
             onTimeEnd={handleTimeEnd}
+            onMapLoaded={handleMapLoaded}
           />
         );
       case 'guessing':

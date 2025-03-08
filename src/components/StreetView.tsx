@@ -8,12 +8,14 @@ interface StreetViewProps {
   currentLocation: Location;
   timeLeft: number;
   onTimeEnd: () => void;
+  onMapLoaded: () => void;
 }
 
 const StreetView: React.FC<StreetViewProps> = ({ 
   currentLocation, 
   timeLeft, 
-  onTimeEnd 
+  onTimeEnd,
+  onMapLoaded
 }) => {
   const streetViewRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
@@ -63,11 +65,13 @@ const StreetView: React.FC<StreetViewProps> = ({
             console.error("Street View data not found for this location");
           }
           setLoading(false);
+          onMapLoaded();
         });
         
         // Set loading to false after a timeout in case the status event doesn't fire
         setTimeout(() => {
           setLoading(false);
+          onMapLoaded();
         }, 3000);
       } catch (error) {
         console.error("Error initializing Street View:", error);
@@ -81,7 +85,7 @@ const StreetView: React.FC<StreetViewProps> = ({
     return () => {
       console.log("Cleaning up Street View effect");
     };
-  }, [currentLocation, loadGoogleMapsAPI]);
+  }, [currentLocation, loadGoogleMapsAPI, onMapLoaded]);
 
   // Timer effect
   useEffect(() => {
