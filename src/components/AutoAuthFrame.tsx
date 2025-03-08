@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import sdk, { FrameNotificationDetails } from "@farcaster/frame-sdk";
-import { getCsrfToken, signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { setUserNotificationDetails } from "~/lib/kv";
 
 // Define the SDK context type based on what's available
@@ -37,6 +37,30 @@ export const broadcastSessionUpdate = (sessionData: any, sdkContext?: FrameSDKCo
   }
 };
 
+// FarcasterRequiredPopup component
+const FarcasterRequiredPopup = () => {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md mx-auto text-center shadow-xl" style={{ fontSize: '1.3em' }}>
+        <h2 className="text-2xl font-extrabold mb-4 text-gray-900 dark:text-white">Open in Warpcast</h2>
+        <p className="mb-6 text-gray-700 dark:text-gray-300">
+          Please open this link from Warpcast app for the best experience.
+        </p>
+        <div className="flex flex-col gap-4">
+          <a 
+            href="https://apps.apple.com/us/app/warpcast/id1600555445" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded transition duration-200"
+          >
+            Get Warpcast
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function AutoAuthFrame() {
   console.log('AutoAuthFrame rendering');
   
@@ -44,9 +68,9 @@ export default function AutoAuthFrame() {
   const [isSDKLoaded, setIsSDKLoaded] = useState(false);
   const [isFrameAdded, setIsFrameAdded] = useState(false);
   const [notificationDetails, setNotificationDetails] = useState<FrameNotificationDetails | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isAuthInProgress, setIsAuthInProgress] = useState(false);
   const [sdkContext, setSdkContext] = useState<FrameSDKContext | null>(null);
+  const [isInFarcaster, setIsInFarcaster] = useState<boolean | null>(null);
+  const [showPopup, setShowPopup] = useState(false);
 
   // Load SDK context
   useEffect(() => {
@@ -60,11 +84,24 @@ export default function AutoAuthFrame() {
           const context = await sdk.context;
           console.log('SDK Context loaded successfully:', context);
           setSdkContext(context);
-          // Broadcast the context even before auth is complete
+          
+          // Check if we're in Farcaster by looking for user.fid
+          const isFarcaster = !!context?.user?.fid;
+          setIsInFarcaster(isFarcaster);
+          
+          // Show popup if not in Farcaster after a short delay
+          if (!isFarcaster) {
+            setTimeout(() => setShowPopup(true), 1000);
+          }
+          
+          // Broadcast the context
           broadcastSessionUpdate({ status }, context);
         }
       } catch (error) {
         console.error('Error loading SDK context:', error);
+        // If there's an error loading the SDK context, we're likely not in Farcaster
+        setIsInFarcaster(false);
+        setTimeout(() => setShowPopup(true), 1000);
       }
     };
     
@@ -78,67 +115,9 @@ export default function AutoAuthFrame() {
     }
   }, [session, status, sdkContext]);
 
-  // Function to get CSRF token for authentication
-  const getNonce = useCallback(async () => {
-    try {
-      const nonce = await getCsrfToken();
-      if (!nonce) throw new Error("Unable to generate nonce");
-      return nonce;
-    } catch (error) {
-      setError("Failed to generate nonce for authentication");
-      console.error("Nonce generation error:", error);
-      return null;
-    }
-  }, []);
-
-  // Automatic sign-in function
-  const autoSignIn = useCallback(async () => {
-    console.log('autoSignIn called, current status:', status, 'isAuthInProgress:', isAuthInProgress);
-    
-    if (status === "authenticated" || isAuthInProgress) {
-      console.log('Already authenticated or auth in progress, skipping autoSignIn');
-      return;
-    }
-    
-    try {
-      console.log('Starting authentication process');
-      setIsAuthInProgress(true);
-      setError(null);
-      
-      const nonce = await getNonce();
-      if (!nonce) {
-        console.log('No nonce available, aborting autoSignIn');
-        return;
-      }
-      
-      console.log('Got nonce, triggering SDK signIn action');
-      // Trigger Farcaster sign-in
-      const result = await sdk.actions.signIn({ nonce });
-      console.log('SDK signIn result:', result);
-      
-      // Send the signed message to our auth backend
-      console.log('Sending credentials to NextAuth');
-      await signIn("credentials", {
-        message: result.message,
-        signature: result.signature,
-        redirect: false,
-      });
-      console.log('NextAuth signIn completed');
-    } catch (e: any) {
-      console.error('Error in autoSignIn:', e);
-      if (e?.message?.includes("rejected")) {
-        setError("Sign-in was rejected");
-      } else {
-        setError("Failed to sign in");
-      }
-    } finally {
-      setIsAuthInProgress(false);
-    }
-  }, [getNonce, status, isAuthInProgress]);
-
   // Automatically add the frame to the client
   const autoAddFrame = useCallback(async () => {
-    if (!isFrameAdded && session) {
+    if (!isFrameAdded && sdkContext?.user?.fid) {
       try {
         const result = await sdk.actions.addFrame();
         setIsFrameAdded(true);
@@ -148,9 +127,9 @@ export default function AutoAuthFrame() {
           setNotificationDetails(result.notificationDetails);
           
           // Store the notification details for this user
-          if (session.user?.fid) {
+          if (sdkContext.user.fid) {
             await setUserNotificationDetails(
-              session.user.fid,
+              sdkContext.user.fid,
               result.notificationDetails
             );
           }
@@ -159,7 +138,7 @@ export default function AutoAuthFrame() {
         console.error("Failed to add frame:", error);
       }
     }
-  }, [isFrameAdded, session]);
+  }, [isFrameAdded, sdkContext]);
 
   // Initialize SDK and set up event listeners
   useEffect(() => {
@@ -183,10 +162,10 @@ export default function AutoAuthFrame() {
           if (notificationDetails) {
             setNotificationDetails(notificationDetails);
             
-            // Store the notification details if we have a session
-            if (session?.user?.fid) {
+            // Store the notification details if we have a user FID
+            if (sdkContext?.user?.fid) {
               setUserNotificationDetails(
-                session.user.fid,
+                sdkContext.user.fid,
                 notificationDetails
               );
             }
@@ -201,10 +180,10 @@ export default function AutoAuthFrame() {
         sdk.on("notificationsEnabled", ({ notificationDetails }) => {
           setNotificationDetails(notificationDetails);
           
-          // Store the notification details if we have a session
-          if (session?.user?.fid) {
+          // Store the notification details if we have a user FID
+          if (sdkContext?.user?.fid) {
             setUserNotificationDetails(
-              session.user.fid,
+              sdkContext.user.fid,
               notificationDetails
             );
           }
@@ -217,11 +196,6 @@ export default function AutoAuthFrame() {
         console.log('Calling sdk.actions.ready()');
         // Tell the SDK we're ready
         sdk.actions.ready({});
-        
-        // Auto sign in after initialization
-        if (status !== "authenticated") {
-          await autoSignIn();
-        }
       } catch (error) {
         console.error("SDK initialization error:", error);
       }
@@ -238,17 +212,14 @@ export default function AutoAuthFrame() {
         sdk.removeAllListeners();
       };
     }
-  }, [isSDKLoaded, autoSignIn, status, session]);
+  }, [isSDKLoaded, sdkContext]);
 
   // Try to add the frame if not added
   useEffect(() => {
-    // if (!isFrameAdded) {
-    //   autoAddFrame();
-    // }
-    if (status === "authenticated" && !isFrameAdded) {
+    if (sdkContext?.user?.fid && !isFrameAdded) {
       autoAddFrame();
     }
-  }, [status, isFrameAdded, autoAddFrame]);
+  }, [sdkContext, isFrameAdded, autoAddFrame]);
 
   // For debugging, log when the component mounts and unmounts
   useEffect(() => {
@@ -258,6 +229,6 @@ export default function AutoAuthFrame() {
     };
   }, []);
 
-  // This component doesn't render anything visible
-  return null;
+  // Render the popup if we're not in Farcaster and showPopup is true
+  return showPopup && !isInFarcaster ? <FarcasterRequiredPopup /> : null;
 } 

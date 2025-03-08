@@ -3,7 +3,6 @@
 FarGuesser.
 
 TODO
-- Remove need for sign in
 - Daily/Global leaderboards
 - Draw a good frame image
 - Add analytics
