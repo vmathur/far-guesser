@@ -7,7 +7,8 @@ const appUrl = process.env.NEXT_PUBLIC_URL;
 
 const frame = {
   version: "next",
-  imageUrl: `${appUrl}/opengraph-image`,
+  // imageUrl: `${appUrl}/opengraph-image`,
+  imageUrl: `${appUrl}/thumbnail.png`,
   button: {
     title: "Play",
     action: {

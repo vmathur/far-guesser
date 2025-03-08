@@ -5,7 +5,6 @@ FarGuesser.
 TODO
 - Fix bug where deploying resets cron
 - Daily/Global leaderboards
-- Draw a good frame image
 
 Tweaks
 - Optimal game length? (prolly 20 seconds)
