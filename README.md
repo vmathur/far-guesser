@@ -4,9 +4,8 @@ FarGuesser.
 
 TODO
 - Minting
-
-Tweaks
-- Optimal game length? (prolly 20 seconds)
+- Fix back button
+- Make local db
 - Change to daily cadence
 
 ## Getting Started
