@@ -1,8 +1,10 @@
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 import { track as vercelTrack } from '@vercel/analytics';
+import { setUserFid as setAnalyticsUserFid, setUserName as setAnalyticsUserName } from './analytics';
 
 type AnalyticsContextType = {
   setFid: (fid: string | number | undefined | null) => void;
+  setUsername: (username: string | undefined | null) => void;
   trackEvent: (eventName: string, eventProps?: Record<string, any>) => void;
 };
 
@@ -14,10 +16,29 @@ interface AnalyticsProviderProps {
 
 export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }) => {
   const [fid, setFidState] = useState<string | null>(null);
+  const [username, setUsernameState] = useState<string | null>(null);
 
   const setFid = (newFid: string | number | undefined | null) => {
     if (newFid) {
-      setFidState(newFid.toString());
+      const fidString = newFid.toString();
+      setFidState(fidString);
+      
+      // IMPORTANT: Also set the FID in the analytics module
+      // This ensures getUserFid() will return the correct value
+      setAnalyticsUserFid(fidString);
+      
+      console.log(`FID set in AnalyticsContext: ${fidString}`);
+    }
+  };
+
+  const setUsername = (newUsername: string | undefined | null) => {
+    if (newUsername) {
+      setUsernameState(newUsername);
+      
+      // Also set the username in the analytics module
+      setAnalyticsUserName(newUsername);
+      
+      console.log(`Username set in AnalyticsContext: ${newUsername}`);
     }
   };
 
@@ -27,6 +48,7 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
     try {
       vercelTrack(eventName, {
         fid,
+        username,
         ...eventProps
       });
     } catch (error) {
@@ -36,6 +58,7 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
 
   const value = {
     setFid,
+    setUsername,
     trackEvent
   };
 

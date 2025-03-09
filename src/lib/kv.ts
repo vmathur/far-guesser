@@ -75,34 +75,115 @@ export async function deleteUserNotificationDetails(
 // Leaderboard functions
 interface LeaderboardEntry {
   name: string;
-  score: number;
+  score: number;  // Score calculated as 100*e^(-distance/2000)
+  distance: number; // Original distance in km
   timestamp: number;
+  fid?: string; // Farcaster ID
 }
 
-function getLeaderboardKey(): string {
-  return `far-guesser:leaderboard`;
+function getAllTimeLeaderboardKey(): string {
+  return `far-guesser:all-time-leaderboard`;
 }
 
-export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
-  const leaderboard = await redis.get<LeaderboardEntry[]>(getLeaderboardKey());
+function getDailyLeaderboardKey(): string {
+  // Use the current date (YYYY-MM-DD format) to generate a daily key
+  const today = new Date();
+  const dateString = today.toISOString().split('T')[0]; // YYYY-MM-DD
+  return `far-guesser:daily-leaderboard:${dateString}`;
+}
+
+// Calculate score from distance using formula: 100*e^(-distance/2000)
+function calculateScore(distance: number): number {
+  return 100 * Math.exp(-distance / 2000);
+}
+
+export async function getAllTimeLeaderboard(): Promise<LeaderboardEntry[]> {
+  const leaderboard = await redis.get<LeaderboardEntry[]>(getAllTimeLeaderboardKey());
   return leaderboard || [];
 }
 
-export async function submitScore(entry: LeaderboardEntry): Promise<void> {
+export async function getDailyLeaderboard(): Promise<LeaderboardEntry[]> {
+  const leaderboard = await redis.get<LeaderboardEntry[]>(getDailyLeaderboardKey());
+  return leaderboard || [];
+}
+
+export async function submitScore(entry: Omit<LeaderboardEntry, 'score'> & { distance: number }): Promise<void> {
+  // Calculate score from distance
+  const calculatedScore = calculateScore(entry.distance);
+  
+  const fullEntry: LeaderboardEntry = {
+    ...entry,
+    score: calculatedScore
+  };
+  
+  // Update daily leaderboard
+  await updateLeaderboard(getDailyLeaderboardKey(), fullEntry);
+  
+  // Update all-time leaderboard
+  await updateLeaderboard(getAllTimeLeaderboardKey(), fullEntry);
+}
+
+async function updateLeaderboard(leaderboardKey: string, entry: LeaderboardEntry): Promise<void> {
   // Get current leaderboard
-  const leaderboard = await getLeaderboard();
+  const leaderboard = await redis.get<LeaderboardEntry[]>(leaderboardKey) || [];
   
-  // Add new entry
-  leaderboard.push(entry);
+  // Check if user with this FID already exists in leaderboard
+  const existingEntryIndex = entry.fid 
+    ? leaderboard.findIndex(e => e.fid === entry.fid)
+    : -1;
   
-  // Sort by score (lower is better for distance)
-  leaderboard.sort((a, b) => a.score - b.score);
+  if (existingEntryIndex >= 0) {
+    // Handle differently based on leaderboard type
+    if (leaderboardKey === getAllTimeLeaderboardKey()) {
+      // For all-time leaderboard, sum the scores
+      leaderboard[existingEntryIndex].score += entry.score;
+      // Update the distance to be the sum as well (though this isn't directly shown)
+      leaderboard[existingEntryIndex].distance += entry.distance;
+      // Update timestamp to the latest
+      leaderboard[existingEntryIndex].timestamp = entry.timestamp;
+    } else {
+      // For daily leaderboard, if user already has an entry and new score is better, update it
+      if (leaderboard[existingEntryIndex].score < entry.score) {
+        leaderboard[existingEntryIndex] = entry;
+      }
+    }
+  } else {
+    // Otherwise add new entry
+    leaderboard.push(entry);
+  }
+  
+  // Sort by score (higher is better for our calculated score)
+  leaderboard.sort((a, b) => b.score - a.score);
   
   // Limit to top 100 scores
   const topScores = leaderboard.slice(0, 100);
   
   // Store back in KV
-  await redis.set(getLeaderboardKey(), topScores);
+  await redis.set(leaderboardKey, topScores);
+}
+
+// For backwards compatibility
+export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
+  return getAllTimeLeaderboard();
+}
+
+// Reset leaderboard functions
+export async function resetDailyLeaderboard(): Promise<void> {
+  // Delete the current day's leaderboard
+  await redis.del(getDailyLeaderboardKey());
+}
+
+export async function resetAllTimeLeaderboard(): Promise<void> {
+  // Delete the all-time leaderboard
+  await redis.del(getAllTimeLeaderboardKey());
+}
+
+export async function resetAllLeaderboards(): Promise<void> {
+  // Reset both daily and all-time leaderboards
+  await Promise.all([
+    resetDailyLeaderboard(),
+    resetAllTimeLeaderboard()
+  ]);
 }
 
 // User round play tracking functions

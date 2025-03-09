@@ -3,8 +3,7 @@
 FarGuesser.
 
 TODO
-- Fix bug where deploying resets cron
-- Daily/Global leaderboards
+- Minting
 
 Tweaks
 - Optimal game length? (prolly 20 seconds)

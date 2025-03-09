@@ -157,8 +157,10 @@ declare global {
 // Interface for leaderboard entry
 export interface LeaderboardEntry {
   name: string;
-  score: number;
+  score: number;  // This will now represent the calculated score (100*e^(-distance/2000))
+  distance?: number; // Original distance in km
   rank: number;
   timestamp?: number;
   isCurrentUser?: boolean;
+  fid?: string; // Farcaster ID
 } 

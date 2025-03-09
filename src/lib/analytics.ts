@@ -1,7 +1,8 @@
 import { useAnalytics } from './AnalyticsContext';
 
-// Store the user's FID
+// Store the user's FID and username
 let userFid: string | null = null;
+let userName: string | null = null;
 
 // Set the user's FID once
 export const setUserFid = (fid: string | number | undefined | null) => {
@@ -10,8 +11,18 @@ export const setUserFid = (fid: string | number | undefined | null) => {
   }
 };
 
+// Set the user's username
+export const setUserName = (username: string | null | undefined) => {
+  if (username) {
+    userName = username;
+  }
+};
+
 // Get the current user's FID
 export const getUserFid = () => userFid;
+
+// Get the current user's username
+export const getUserName = () => userName;
 
 export const useGameAnalytics = () => {
   const { trackEvent } = useAnalytics();

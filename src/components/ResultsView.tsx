@@ -11,6 +11,7 @@ interface ResultsViewProps {
   actualLocation: Location;
   onNextLocation: () => void;
   selectedFont?: string;
+  errorMessage?: string | null;
 }
 
 // Define a type for the SDK context
@@ -42,21 +43,20 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   guess, 
   actualLocation, 
   onNextLocation,
-  selectedFont = 'Chalkboard SE'
+  selectedFont = 'Chalkboard SE',
+  errorMessage = null
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const googleMapRef = useRef<google.maps.Map | null>(null);
   const [loading, setLoading] = useState(true);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
-  const [playRecorded, setPlayRecorded] = useState(false);
-  const [debugMessage, setDebugMessage] = useState<string>('');
   const [sdkContext, setSdkContext] = useState<FrameSDKContext | null>(null);
   const [customSessionData, setCustomSessionData] = useState<any>(null);
   
   const loadGoogleMapsAPI = useGoogleMapsLoader(setLoading);
   const analytics = useGameAnalytics();
   
-  // Load SDK context directly
+  // Load SDK context
   useEffect(() => {
     const loadSdkContext = async () => {
       try {
@@ -92,61 +92,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     }
   }, []);
   
-  const getUserFid = () => {
-    return (
-      sdkContext?.user?.fid?.toString() || 
-      customSessionData?.user?.fid?.toString()
-    );
-  };
-  
-  // Record that the user has played
-  useEffect(() => {
-    // Prevent multiple recording attempts
-    if (playRecorded) return;
-    
-    const recordPlay = async () => {
-      // Only proceed if we have a user FID
-      const userFid = getUserFid();
-      if (!userFid) {
-        setDebugMessage('Waiting for user FID...');
-        return;
-      }
-      
-      setDebugMessage(`Using FID: ${userFid}, recording play...`);
-      
-      try {
-        // Log the request for debugging
-        console.log(`Recording play for FID: ${userFid}`);
-        
-        const response = await fetch('/api/record-play', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Farcaster-User-FID': userFid
-          },
-          body: JSON.stringify({ fid: userFid }),
-        });
-        
-        console.log('Record play API response status:', response.status);
-        
-        const data = await response.json();
-        console.log('Record play API response data:', data);
-        
-        if (data.success) {
-          setPlayRecorded(true);
-          setDebugMessage(`Play recorded successfully for FID: ${userFid}`);
-        } else {
-          setDebugMessage(`API responded with error: ${data.error || 'Unknown error'}`);
-        }
-      } catch (error) {
-        console.error('Error recording play:', error);
-        setDebugMessage(`Error recording play: ${error instanceof Error ? error.message : String(error)}`);
-      }
-    };
-    
-    recordPlay();
-  }, [playRecorded, sdkContext, customSessionData]);
-
   // Initialize the results map
   useEffect(() => {
     if (!mapRef.current) return;
@@ -314,6 +259,20 @@ const ResultsView: React.FC<ResultsViewProps> = ({
       boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
       color: '#000'
     }}>
+      
+      {errorMessage && (
+        <div style={{
+          backgroundColor: '#ffebee',
+          color: '#d32f2f',
+          padding: '12px 16px',
+          borderRadius: '4px',
+          marginBottom: '20px',
+          border: '1px solid #ffcdd2',
+          fontFamily: `"${selectedFont}", "Comic Sans MS", cursive`
+        }}>
+          {errorMessage}
+        </div>
+      )}
       
       <div style={{ 
         height: '500px', 

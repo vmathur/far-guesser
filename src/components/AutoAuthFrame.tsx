@@ -72,7 +72,7 @@ export default function AutoAuthFrame() {
   const [sdkContext, setSdkContext] = useState<FrameSDKContext | null>(null);
   const [isInFarcaster, setIsInFarcaster] = useState<boolean | null>(null);
   const [showPopup, setShowPopup] = useState(false);
-  const { setFid } = useAnalytics();
+  const { setFid, setUsername } = useAnalytics();
 
   // Load SDK context
   useEffect(() => {
@@ -86,9 +86,17 @@ export default function AutoAuthFrame() {
           const isFarcaster = !!context?.user?.fid;
           setIsInFarcaster(isFarcaster);
           
-          // Set the FID in the analytics context if available
+          // Set the FID and username in the analytics context if available
           if (context?.user?.fid) {
             setFid(context.user.fid);
+            
+            // Also set the username if available
+            if (context.user.username) {
+              setUsername(context.user.username);
+              console.log('Farcaster username set:', context.user.username);
+            } else {
+              console.log('Farcaster username not available');
+            }
           }
           
           // Show popup if not in Farcaster after a short delay
@@ -107,7 +115,7 @@ export default function AutoAuthFrame() {
     };
     
     loadSdkContext();
-  }, [setFid, status]);
+  }, [setFid, setUsername, status]);
 
   // Broadcast session updates whenever the session changes or SDK context is available
   useEffect(() => {
@@ -146,6 +154,7 @@ export default function AutoAuthFrame() {
     const initialize = async () => {
       try {
         const context = await sdk.context;
+        console.log('SDK context:', context);
         setIsFrameAdded(context.client.added);
         setNotificationDetails(context.client.notificationDetails ?? null);
         
