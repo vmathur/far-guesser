@@ -4,9 +4,6 @@ FarGuesser.
 
 TODO
 - Minting
-- Fix back button
-- Make local db
-- Change to daily cadence
 
 ## Getting Started
 

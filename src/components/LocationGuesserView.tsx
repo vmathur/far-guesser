@@ -137,7 +137,20 @@ const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({ selectedFont,
 
   // Handle going to next location or leaderboard
   const handleNextLocation = () => {
-    setGameState('leaderboard');
+    if (gameState === 'results') {
+      // When in results view, clicking "View Leaderboard" should go to leaderboard
+      setGameState('leaderboard');
+    } else if (gameState === 'leaderboard') {
+      // When in leaderboard view, clicking "Back to Game" should go back to results or viewing
+      if (guess) {
+        setGameState('results');
+      } else {
+        setGameState('viewing');
+      }
+    } else {
+      // Default fallback behavior
+      setGameState('viewing');
+    }
   };
 
   const renderGameState = () => {
