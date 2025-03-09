@@ -6,6 +6,11 @@ import { useGoogleMapsLoader } from './utils/GoogleMapsUtil';
 import sdk from '@farcaster/frame-sdk';
 import { useGameAnalytics } from '../lib/analytics';
 
+// Function to calculate score from distance
+const calculateScore = (distance: number): number => {
+  return 100 * Math.exp(-distance / 2000);
+};
+
 interface ResultsViewProps {
   guess: Guess;
   actualLocation: Location;
@@ -52,9 +57,18 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [sdkContext, setSdkContext] = useState<FrameSDKContext | null>(null);
   const [customSessionData, setCustomSessionData] = useState<any>(null);
+  const [score, setScore] = useState<number>(0);
   
   const loadGoogleMapsAPI = useGoogleMapsLoader(setLoading);
   const analytics = useGameAnalytics();
+  
+  // Calculate score when component mounts
+  useEffect(() => {
+    if (guess?.distance) {
+      const calculatedScore = calculateScore(guess.distance);
+      setScore(calculatedScore);
+    }
+  }, [guess]);
   
   // Load SDK context
   useEffect(() => {
@@ -309,6 +323,36 @@ const ResultsView: React.FC<ResultsViewProps> = ({
             height: '100%'
           }}
         ></div>
+      </div>
+      
+      {/* Score Bar */}
+      <div style={{
+        marginBottom: '15px',
+        width: '100%',
+        fontFamily: `"${selectedFont}", "Comic Sans MS", cursive`
+      }}>
+        <div style={{
+          fontSize: '18px',
+          marginBottom: '5px',
+          fontWeight: 'bold'
+        }}>
+          Your Score: {Math.round(score)} / 100
+        </div>
+        <div style={{
+          width: '100%',
+          height: '20px',
+          backgroundColor: '#e0e0e0',
+          borderRadius: '10px',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            width: `${Math.max(Math.min(Math.round(score), 100), 0)}%`,
+            height: '100%',
+            backgroundColor: score > 70 ? '#4CAF50' : score > 40 ? '#FFC107' : '#F44336',
+            borderRadius: '10px',
+            transition: 'width 1s ease-in-out'
+          }}></div>
+        </div>
       </div>
       
       <div style={{ 

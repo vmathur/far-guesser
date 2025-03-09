@@ -107,28 +107,6 @@ const StreetView: React.FC<StreetViewProps> = ({
 
   return (
     <div>
-      {/* Timer component at the top */}
-      <div style={{ 
-        backgroundColor: '#f0f0f0',
-        color: timeLeft <= 5000 ? 'red' : '#333',
-        padding: '8px 15px',
-        borderRadius: '8px',
-        fontSize: '36px',
-        fontWeight: 'bold',
-        marginBottom: '15px',
-        display: 'inline-block',
-        border: '2px solid #ddd',
-        fontFamily: '"Chalkboard SE", "Marker Felt", "Comic Sans MS", cursive',
-        boxShadow: '0 3px 6px rgba(0,0,0,0.1)',
-        transition: 'all 0.3s ease',
-        transform: timeLeft < 3000 ? 'scale(1.1)' : 'scale(1)',
-        width: '160px',
-        textAlign: 'center',
-        whiteSpace: 'nowrap',
-      }}>
-        {(timeLeft / 1000).toFixed(2) +' s'}
-      </div>
-      
       <div 
         style={{ 
           height: '500px', 
@@ -149,6 +127,30 @@ const StreetView: React.FC<StreetViewProps> = ({
           }}
         />
         
+        {/* Timer overlay in top right corner */}
+        <div style={{ 
+          position: 'absolute',
+          top: '20px',
+          left: '20px',
+          zIndex: 5,
+          backgroundColor: 'rgba(240, 240, 240, 0.8)',
+          color: timeLeft <= 5000 ? 'red' : '#333',
+          padding: '0px 12px',
+          borderRadius: '8px',
+          fontSize: '24px',
+          fontWeight: 'bold',
+          width: '110px',
+          border: '2px solid rgba(221, 221, 221, 0.8)',
+          fontFamily: '"Chalkboard SE", "Marker Felt", "Comic Sans MS", cursive',
+          boxShadow: '0 3px 6px rgba(0,0,0,0.1)',
+          transition: 'all 0.3s ease',
+          transform: timeLeft < 3000 ? 'scale(1.1)' : 'scale(1)',
+          textAlign: 'center',
+          whiteSpace: 'nowrap',
+        }}>
+          {(timeLeft / 1000).toFixed(1) +' s'}
+        </div>
+        
         {loading && (
           <div style={{ 
             position: 'absolute',
@@ -165,6 +167,39 @@ const StreetView: React.FC<StreetViewProps> = ({
             Loading Street View...
           </div>
         )}
+      </div>
+
+      {/* Next button outside the streetview */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        marginBottom: '20px'
+      }}>
+        <button
+          onClick={onTimeEnd}
+          style={{
+            padding: '12px 25px',
+            backgroundColor: '#4CAF50',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '16px',
+            fontWeight: 'bold',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.backgroundColor = '#45a049';
+            e.currentTarget.style.transform = 'scale(1.05)';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.backgroundColor = '#4CAF50';
+            e.currentTarget.style.transform = 'scale(1)';
+          }}
+        >
+          Next
+        </button>
       </div>
     </div>
   );

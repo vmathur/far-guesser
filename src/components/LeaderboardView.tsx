@@ -154,6 +154,26 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       margin: '0 auto',
       fontFamily: `"${selectedFont}", "Comic Sans MS", cursive`
     }}>
+      {/* Back Button */}
+      <button
+        onClick={onNextLocation}
+        style={{
+          padding: '8px 16px',
+          marginBottom: '20px',
+          backgroundColor: '#f0f0f0',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          fontFamily: `"${selectedFont}", "Comic Sans MS", cursive`,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '5px',
+          transition: 'background-color 0.2s'
+        }}
+      >
+        ← Back to Game
+      </button>
+
       {isLoading ? (
         <div style={{ textAlign: 'center', padding: '40px' }}>
           Loading leaderboard...

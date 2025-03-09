@@ -3,6 +3,7 @@ import { CSSProperties } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 import sdk from '@farcaster/frame-sdk';
 import { useGameAnalytics } from '~/lib/analytics';
+import { gameConfig } from '~/lib/gameConfig';
 
 interface RulesScreenProps {
   onPlay: () => void;
@@ -294,11 +295,11 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>📌 FarGuesser</h1>
+      <h1 style={styles.title}>🔎 FarGuesser</h1>
       
       <div style={styles.rulesContainer}>
         <p style={styles.rule}>
-          1. Explore a mystery location for 15 seconds
+          1. Explore a mystery location for {Math.round(gameConfig.VIEWING_TIME_MS / 1000)} seconds
         </p>
         <p style={styles.rule}>
           2. Guess where it is on the map

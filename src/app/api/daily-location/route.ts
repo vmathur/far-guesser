@@ -68,8 +68,12 @@ export async function GET(request: Request) {
     // Send a notification to all users who have added the frame
     try {
       console.log('Sending notifications to all subscribers...');
+      // const notificationResult = await sendNotificationToAllSubscribers(
+      //   `${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} round begins now`,
+      //   "The mystery location awaits"
+      // );
       const notificationResult = await sendNotificationToAllSubscribers(
-        `${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} round begins now`,
+        `New round begins now`,
         "The mystery location awaits"
       );
       
