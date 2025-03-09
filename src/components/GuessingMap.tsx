@@ -16,6 +16,7 @@ const GuessingMap: React.FC<GuessingMapProps> = ({ onGuessSubmitted }) => {
   const [guess, setGuess] = useState<Guess | null>(null);
   const [marker, setMarker] = useState<google.maps.Marker | null>(null);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   
   const loadGoogleMapsAPI = useGoogleMapsLoader(setLoading);
 
@@ -147,7 +148,10 @@ const GuessingMap: React.FC<GuessingMapProps> = ({ onGuessSubmitted }) => {
   }, [loadGoogleMapsAPI]);
 
   const handleSubmitGuess = () => {
-    if (!guess) return;
+    if (!guess || submitting) return;
+    
+    // Set submitting state to true
+    setSubmitting(true);
     
     // Call the parent component's onGuessSubmitted function with the current guess
     onGuessSubmitted(guess);
@@ -210,21 +214,21 @@ const GuessingMap: React.FC<GuessingMapProps> = ({ onGuessSubmitted }) => {
       
       <button
         onClick={handleSubmitGuess}
-        disabled={!guess || !marker} // Use marker state to validate submit button
+        disabled={!guess || !marker || submitting} // Also disable when submitting
         style={{
           padding: '15px 30px',
-          backgroundColor: (guess && marker) ? '#4CAF50' : '#cccccc',
+          backgroundColor: (guess && marker && !submitting) ? '#4CAF50' : '#cccccc',
           color: 'white',
           border: 'none',
           borderRadius: '4px',
-          cursor: (guess && marker) ? 'pointer' : 'not-allowed',
+          cursor: (guess && marker && !submitting) ? 'pointer' : 'not-allowed',
           fontSize: '18px',
           fontWeight: 'bold',
-          boxShadow: (guess && marker) ? '0 4px 8px rgba(0, 0, 0, 0.2)' : 'none',
+          boxShadow: (guess && marker && !submitting) ? '0 4px 8px rgba(0, 0, 0, 0.2)' : 'none',
           transition: 'background-color 0.2s ease'
         }}
       >
-        Go
+        {submitting ? 'Loading...' : 'Go'}
       </button>
     </div>
   );
