@@ -2,10 +2,41 @@ import { FrameNotificationDetails } from "@farcaster/frame-sdk";
 import { Redis } from "@upstash/redis";
 import { ROUND_DURATION_MS } from './gameConfig';
 
-const redis = new Redis({
-  url: process.env.KV_REST_API_URL,
-  token: process.env.KV_REST_API_TOKEN,
-});
+// Add better error handling for Redis configuration
+const createRedisClient = () => {
+  const url = process.env.KV_REST_API_URL;
+  const token = process.env.KV_REST_API_TOKEN;
+  
+  if (!url || !token) {
+    console.warn('Redis credentials missing: KV_REST_API_URL or KV_REST_API_TOKEN not found in environment variables');
+    // Return dummy Redis client for development that logs operations instead of failing
+    return {
+      get: async (key: string) => { 
+        console.log(`[DEV Redis] GET ${key}`);
+        return null;
+      },
+      set: async (key: string, value: any) => {
+        console.log(`[DEV Redis] SET ${key}`, value);
+        return null;
+      },
+      del: async (key: string) => {
+        console.log(`[DEV Redis] DEL ${key}`);
+        return null;
+      },
+      scan: async (options: any) => {
+        console.log('[DEV Redis] SCAN', options);
+        return { keys: [], cursor: 0 };
+      }
+    } as unknown as Redis;
+  }
+  
+  return new Redis({
+    url,
+    token,
+  });
+};
+
+const redis = createRedisClient();
 
 function getUserNotificationDetailsKey(fid: number): string {
   return `far-guesser-notifications:user:${fid}`;
@@ -63,6 +94,7 @@ export async function setUserNotificationDetails(
   fid: number,
   notificationDetails: FrameNotificationDetails
 ): Promise<void> {
+  console.log('setting notification details for', fid, notificationDetails);
   await redis.set(getUserNotificationDetailsKey(fid), notificationDetails);
 }
 
@@ -85,11 +117,10 @@ function getAllTimeLeaderboardKey(): string {
   return `far-guesser:all-time-leaderboard`;
 }
 
-function getDailyLeaderboardKey(): string {
-  // Use the current date (YYYY-MM-DD format) to generate a daily key
-  const today = new Date();
-  const dateString = today.toISOString().split('T')[0]; // YYYY-MM-DD
-  return `far-guesser:daily-leaderboard:${dateString}`;
+async function getDailyLeaderboardKey(): Promise<string> {
+  // Get the current location index from Redis
+  const locationIndex = await redis.get<number>(LOCATION_INDEX_KEY) || 0;
+  return `far-guesser:daily-leaderboard:by-location:${locationIndex}`;
 }
 
 // Calculate score from distance using formula: 100*e^(-distance/2000)
@@ -103,7 +134,7 @@ export async function getAllTimeLeaderboard(): Promise<LeaderboardEntry[]> {
 }
 
 export async function getDailyLeaderboard(): Promise<LeaderboardEntry[]> {
-  const leaderboard = await redis.get<LeaderboardEntry[]>(getDailyLeaderboardKey());
+  const leaderboard = await redis.get<LeaderboardEntry[]>(await getDailyLeaderboardKey());
   return leaderboard || [];
 }
 
@@ -117,7 +148,7 @@ export async function submitScore(entry: Omit<LeaderboardEntry, 'score'> & { dis
   };
   
   // Update daily leaderboard
-  await updateLeaderboard(getDailyLeaderboardKey(), fullEntry);
+  await updateLeaderboard(await getDailyLeaderboardKey(), fullEntry);
   
   // Update all-time leaderboard
   await updateLeaderboard(getAllTimeLeaderboardKey(), fullEntry);
@@ -170,7 +201,7 @@ export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
 // Reset leaderboard functions
 export async function resetDailyLeaderboard(): Promise<void> {
   // Delete the current day's leaderboard
-  await redis.del(getDailyLeaderboardKey());
+  await redis.del(await getDailyLeaderboardKey());
 }
 
 export async function resetAllTimeLeaderboard(): Promise<void> {
@@ -186,22 +217,66 @@ export async function resetAllLeaderboards(): Promise<void> {
   ]);
 }
 
+// New function to reset all game data
+export async function resetAll(): Promise<void> {
+  try {
+    // 1. Reset all-time leaderboard
+    await resetAllTimeLeaderboard();
+    
+    // 2. Reset ALL daily leaderboards for all locations, not just the current one
+    const dailyLeaderboardKeys = await redis.keys('far-guesser:daily-leaderboard:by-location:*');
+    if (dailyLeaderboardKeys && dailyLeaderboardKeys.length > 0) {
+      await Promise.all(dailyLeaderboardKeys.map(key => redis.del(key)));
+    }
+    
+    // 3. Delete all play statuses
+    const playStatusKeys = await redis.keys('far-guesser:user-play:*');
+    if (playStatusKeys && playStatusKeys.length > 0) {
+      await Promise.all(playStatusKeys.map(key => redis.del(key)));
+    }
+    
+    // 4. Delete all notifications
+    const notificationKeys = await redis.keys(`${getUserNotificationKeysPrefix()}*`);
+    if (notificationKeys && notificationKeys.length > 0) {
+      await Promise.all(notificationKeys.map(key => redis.del(key)));
+    }
+    
+    // 5. Reset location index to 0
+    await redis.set(LOCATION_INDEX_KEY, 0);
+    
+    // 6. Update last location update time to current time
+    await redis.set(LOCATION_UPDATED_KEY, new Date().toISOString());
+  } catch (error) {
+    console.error('Error in resetAll:', error);
+    throw error;
+  }
+}
+
 // User round play tracking functions
 function getUserRoundPlayKey(fid: number): string {
   return `far-guesser:user-play:${fid}`;
 }
 
 export async function recordUserPlay(fid: number): Promise<void> {
-  await redis.set(getUserRoundPlayKey(fid), Date.now());
+  // Get the current location index
+  const currentLocationIndex = await redis.get<number>(LOCATION_INDEX_KEY) || 0;
+  
+  // Store the location index that the user played instead of timestamp
+  await redis.set(getUserRoundPlayKey(fid), currentLocationIndex);
 }
 
 export async function hasUserPlayedCurrentRound(fid: number): Promise<boolean> {
-  const lastPlayed = await redis.get<number>(getUserRoundPlayKey(fid));
-  if (!lastPlayed) return false;
+  // Get the location index when the user last played
+  const lastPlayedLocationIndex = await redis.get<number>(getUserRoundPlayKey(fid));
   
-  const lastRoundUpdate = await getLastRoundUpdateTime();
-  // User has played if their last play timestamp is after the last round update
-  return lastPlayed > lastRoundUpdate;
+  // If user hasn't played any round yet
+  if (lastPlayedLocationIndex === null || lastPlayedLocationIndex === undefined) return false;
+  
+  // Get the current location index
+  const currentLocationIndex = await redis.get<number>(LOCATION_INDEX_KEY) || 0;
+  
+  // User has played the current round if the location indices match
+  return lastPlayedLocationIndex === currentLocationIndex;
 }
 
 // Round timing functions
