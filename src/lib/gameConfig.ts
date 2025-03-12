@@ -9,7 +9,7 @@ export const gameConfig = {
    * 
    * Users can only play once per round.
    */
-  ROUND_DURATION_MINUTES: 60,
+  ROUND_DURATION_MINUTES: 1440,
   
   /**
    * Time in milliseconds that a player can view the street view
