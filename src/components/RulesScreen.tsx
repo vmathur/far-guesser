@@ -56,17 +56,13 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
   
   // Load SDK context directly
   useEffect(() => {
-    console.log('RulesScreen: Loading SDK context effect running');
     
     const loadSdkContext = async () => {
       try {
-        console.log('RulesScreen: Inside loadSdkContext function');
         if (typeof sdk !== 'undefined' && sdk) {
-          console.log('RulesScreen: SDK is available, requesting context...');
           
           // Access sdk.context directly as a promise
           const context = await sdk.context;
-          console.log('RulesScreen: Context loaded:', context);
           setSdkContext(context);
         } else {
           console.log('RulesScreen: SDK is not available yet');

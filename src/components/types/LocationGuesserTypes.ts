@@ -12,6 +12,7 @@ export interface Location {
 export interface Guess {
   position: { lat: number; lng: number };
   distance: number;
+  pfpUrl?: string; // Optional field for profile picture URL
 }
 
 // Define proper type-safe event listener for Google Maps

@@ -13,11 +13,19 @@ const scoreSubmissionSchema = z.object({
   name: z.string().min(1).max(50),
   distance: z.number().positive(),
   fid: z.string().optional().nullable(),
+  position: z.object({
+    lat: z.number(),
+    lng: z.number()
+  }).optional().nullable(),
+  pfpUrl: z.string().url().optional().nullable(),
 });
 
 export async function GET(request: NextRequest) {
   try {
     const type = request.nextUrl.searchParams.get('type') || 'all-time';
+    const limitParam = request.nextUrl.searchParams.get('limit');
+    const includeGuesses = request.nextUrl.searchParams.get('include_guesses') === 'true';
+    const limit = limitParam ? parseInt(limitParam, 10) : undefined;
     
     let leaderboard;
     if (type === 'daily') {
@@ -32,7 +40,19 @@ export async function GET(request: NextRequest) {
       rank: index + 1,
     }));
     
-    return Response.json({ success: true, data: rankedLeaderboard });
+    // Apply limit if specified
+    const limitedLeaderboard = limit ? rankedLeaderboard.slice(0, limit) : rankedLeaderboard;
+    
+    // If include_guesses is not true, remove position and pfpUrl data to reduce payload size
+    const filteredLeaderboard = includeGuesses 
+      ? limitedLeaderboard 
+      : limitedLeaderboard.map(({ position, pfpUrl, ...rest }) => rest);
+    
+    return Response.json({ 
+      success: true, 
+      leaderboard: filteredLeaderboard,
+      totalEntries: leaderboard.length
+    });
   } catch (error) {
     console.error("Error fetching leaderboard:", error);
     return Response.json(
@@ -93,7 +113,9 @@ export async function POST(request: NextRequest) {
       name: result.data.name,
       distance: result.data.distance,
       timestamp: Date.now(),
-      fid: result.data.fid || undefined
+      fid: result.data.fid || undefined,
+      position: result.data.position,
+      pfpUrl: result.data.pfpUrl
     };
     
     await submitScore(entry);

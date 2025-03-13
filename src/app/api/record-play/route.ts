@@ -1,92 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import { recordUserPlay } from '../../../lib/kv';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../../auth';
-
-// Schema for validation
-const recordPlaySchema = z.object({
-  fid: z.union([
-    z.number(),
-    z.string().transform(val => parseInt(val, 10))
-  ]),
-});
+import { recordUserPlay } from '../../../lib/kv';
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('Received record-play request');
-    
     // Get FID from header or from session
     const fidFromHeader = request.headers.get('X-Farcaster-User-FID');
-    console.log('FID from header:', fidFromHeader);
     
     // Ensure the user is authenticated via session or header
     const session = await getServerSession(authOptions);
-    console.log('Session:', session ? 'Exists' : 'Not found', 'User FID:', session?.user?.fid);
     
-    // Use header FID first, then fallback to session FID
-    const headerFid = fidFromHeader ? parseInt(fidFromHeader, 10) : null;
-    const sessionFid = session?.user?.fid;
+    // Use header FID if available, otherwise use session FID
+    let userFid = fidFromHeader ? parseInt(fidFromHeader, 10) : session?.user?.fid;
     
-    // Parse and validate the request body
-    const requestJson = await request.json().catch(err => {
-      console.error('Error parsing JSON:', err);
-      return null;
+    // Parse the request body
+    const body = await request.json();
+    
+    // If FID is in the body, prefer that (useful for testing)
+    if (body.fid) {
+      userFid = body.fid;
+    }
+    
+    if (!userFid) {
+      return NextResponse.json({ success: false, error: 'Unauthorized - No FID available' }, { status: 401 });
+    }
+    
+    // Get the guess data from the request body
+    const { guessData } = body;
+    
+    // Record that the user has played this round with their guess data
+    await recordUserPlay(userFid, guessData);
+    
+    return NextResponse.json({
+      success: true,
+      message: 'User play recorded successfully'
     });
-    
-    console.log('Request body:', requestJson);
-    
-    if (!requestJson) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid JSON in request body' },
-        { status: 400 }
-      );
-    }
-    
-    const result = recordPlaySchema.safeParse(requestJson);
-    console.log('Result:', result);
-    
-    if (!result.success) {
-      console.log('Validation error:', result.error.errors);
-      return NextResponse.json(
-        { success: false, error: result.error.errors },
-        { status: 400 }
-      );
-    }
-    
-    // Get the FID from the body
-    const bodyFid = result.data.fid;
-    
-    // Prioritize which FID to use based on availability
-    // 1. Use header FID if available
-    // 2. Otherwise use session FID if available
-    // 3. Finally use body FID if no other option
-    const fidToUse = headerFid || sessionFid || bodyFid;
-    
-    if (!fidToUse) {
-      console.log('No valid FID available from any source');
-      return NextResponse.json(
-        { success: false, error: 'No valid FID available' },
-        { status: 400 }
-      );
-    }
-    
-    // Validate if body FID matches the authenticated FID
-    if (bodyFid !== fidToUse) {
-      console.log(`FID mismatch: body=${bodyFid}, using=${fidToUse}`);
-      console.log('Warning: Body FID does not match authenticated FID, using authenticated FID instead');
-    }
-    
-    // Record the user's play
-    console.log(`Recording play for user ${fidToUse}`);
-    await recordUserPlay(fidToUse);
-    console.log(`Successfully recorded play for user ${fidToUse}`);
-    
-    return NextResponse.json({ success: true, fid: fidToUse });
   } catch (error) {
-    console.error("Error recording play:", error);
+    console.error("Error recording user play:", error);
     return NextResponse.json(
-      { success: false, error: `Failed to record play: ${error instanceof Error ? error.message : String(error)}` },
+      { success: false, error: `Failed to record user play: ${error instanceof Error ? error.message : String(error)}` },
       { status: 500 }
     );
   }

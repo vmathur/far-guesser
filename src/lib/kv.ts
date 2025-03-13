@@ -111,6 +111,11 @@ interface LeaderboardEntry {
   distance: number; // Original distance in km
   timestamp: number;
   fid?: string; // Farcaster ID
+  position?: { 
+    lat?: number; 
+    lng?: number; 
+  }; // User's guess position
+  pfpUrl?: string; // User's profile picture URL
 }
 
 function getAllTimeLeaderboardKey(): string {
@@ -257,12 +262,39 @@ function getUserRoundPlayKey(fid: number): string {
   return `far-guesser:user-play:${fid}`;
 }
 
-export async function recordUserPlay(fid: number): Promise<void> {
+// New function to get user's round play data
+export async function getUserRoundPlay(fid: number): Promise<any> {
+  // Get the current location index
+  const currentLocationIndex = await redis.get<number>(LOCATION_INDEX_KEY) || 0;
+  
+  // Get the location index when the user last played
+  const lastPlayedLocationIndex = await redis.get<number>(getUserRoundPlayKey(fid));
+  
+  // If user hasn't played any round yet or played a different round
+  if (lastPlayedLocationIndex === null || lastPlayedLocationIndex === undefined || 
+      lastPlayedLocationIndex !== currentLocationIndex) {
+    return null;
+  }
+  
+  // Get the user's guess data from the detailed guess storage
+  const userGuessKey = `far-guesser:user-guess:${fid}:${currentLocationIndex}`;
+  const userGuess = await redis.get(userGuessKey);
+  
+  return userGuess;
+}
+
+export async function recordUserPlay(fid: number, guessData?: any): Promise<void> {
   // Get the current location index
   const currentLocationIndex = await redis.get<number>(LOCATION_INDEX_KEY) || 0;
   
   // Store the location index that the user played instead of timestamp
   await redis.set(getUserRoundPlayKey(fid), currentLocationIndex);
+  
+  // If guess data is provided, store it in a separate key for retrieval later
+  if (guessData) {
+    const userGuessKey = `far-guesser:user-guess:${fid}:${currentLocationIndex}`;
+    await redis.set(userGuessKey, guessData);
+  }
 }
 
 export async function hasUserPlayedCurrentRound(fid: number): Promise<boolean> {

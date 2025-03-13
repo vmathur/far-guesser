@@ -66,8 +66,8 @@ const GuessingMap: React.FC<GuessingMapProps> = ({ onGuessSubmitted }) => {
               center: { lat: 20, lng: 0 },
               zoom: 2,
               streetViewControl: false,
-              mapTypeControl: true,
               fullscreenControl: true,
+              mapTypeControl: false,
               zoomControl: true,
             });
             
@@ -163,7 +163,7 @@ const GuessingMap: React.FC<GuessingMapProps> = ({ onGuessSubmitted }) => {
         Tap anywhere on the map to place your marker
       </p>
       <div style={{ 
-        height: '500px', 
+        height: '400px', 
         width: '100%', 
         borderRadius: '8px',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',

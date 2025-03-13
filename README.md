@@ -2,8 +2,9 @@
 
 FarGuesser.
 
-TODO
+P0
 - Minting
+
 ## Getting Started
 
 This is a [NextJS](https://nextjs.org/) + TypeScript + React app.

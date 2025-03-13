@@ -62,9 +62,7 @@ const FarcasterRequiredPopup = () => {
   );
 };
 
-export default function AutoAuthFrame() {
-  console.log('AutoAuthFrame rendering');
-  
+export default function AutoAuthFrame() {  
   const { data: session, status } = useSession();
   const [isSDKLoaded, setIsSDKLoaded] = useState(false);
   const [isFrameAdded, setIsFrameAdded] = useState(false);
@@ -154,7 +152,6 @@ export default function AutoAuthFrame() {
     const initialize = async () => {
       try {
         const context = await sdk.context;
-        console.log('SDK context:', context);
         setIsFrameAdded(context.client.added);
         setNotificationDetails(context.client.notificationDetails ?? null);
         
@@ -219,14 +216,6 @@ export default function AutoAuthFrame() {
       autoAddFrame();
     }
   }, [sdkContext, isFrameAdded, autoAddFrame, setFid]);
-
-  // For debugging, log when the component mounts and unmounts
-  useEffect(() => {
-    console.log('AutoAuthFrame mounted');
-    return () => {
-      console.log('AutoAuthFrame unmounted');
-    };
-  }, []);
 
   // Render the popup if we're not in Farcaster and showPopup is true
   return showPopup && !isInFarcaster ? <FarcasterRequiredPopup /> : null;

@@ -15,9 +15,7 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   selectedFont = 'Chalkboard SE' 
 }) => {
   const [allTimeLeaderboard, setAllTimeLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [dailyLeaderboard, setDailyLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'daily' | 'all-time'>('daily');
   const analytics = useGameAnalytics();
   const userFid = getUserFid();
 
@@ -31,30 +29,27 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({
     const fetchLeaderboards = async () => {
       setIsLoading(true);
       try {
-        // Fetch daily leaderboard
-        const dailyResponse = await fetch('/api/leaderboard?type=daily');
-        const dailyData = await dailyResponse.json();
-        
-        // Fetch all-time leaderboard
+        // Only fetch all-time leaderboard
         const allTimeResponse = await fetch('/api/leaderboard?type=all-time');
         const allTimeData = await allTimeResponse.json();
         
-        if (dailyData.success && allTimeData.success) {
-          // Mark current user entries
+        if (allTimeData.success) {
+          // Mark current user entries and ensure scores are processed correctly
           const processLeaderboard = (entries: LeaderboardEntry[]) => {
-            return entries.map(entry => ({
+            return entries.map((entry, index) => ({
               ...entry,
+              // Add rank if not provided by the API
+              rank: entry.rank || index + 1,
               isCurrentUser: entry.fid === userFid
             }));
           };
           
-          setDailyLeaderboard(processLeaderboard(dailyData.data));
-          setAllTimeLeaderboard(processLeaderboard(allTimeData.data));
+          setAllTimeLeaderboard(processLeaderboard(allTimeData.leaderboard || allTimeData.data || []));
         } else {
-          console.error("Error fetching leaderboards", dailyData, allTimeData);
+          console.error("Error fetching all-time leaderboard", allTimeData);
         }
       } catch (error) {
-        console.error("Error fetching leaderboards:", error);
+        console.error("Error fetching all-time leaderboard:", error);
         
         // In case of error, use mock data
         const mockData: LeaderboardEntry[] = Array.from({ length: 10 }).map((_, i) => ({
@@ -67,7 +62,6 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({
           fid: i === 4 ? userFid || undefined : undefined
         }));
         
-        setDailyLeaderboard(mockData);
         setAllTimeLeaderboard(mockData);
       } finally {
         setIsLoading(false);
@@ -105,13 +99,14 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({
               }}
             >
               <td style={{ padding: '10px', fontWeight: 'bold' }}>
-                {entry.rank}
+                {entry.rank || index + 1}
               </td>
               <td style={{ padding: '10px' }}>
                 {entry.isCurrentUser ? <strong>{entry.name} (You)</strong> : entry.name}
               </td>
               <td style={{ padding: '10px' }}>
-                {Math.round(entry.score)} {/* Display calculated score rounded to nearest integer */}
+                {/* Display the score directly from the API, already rounded appropriately */}
+                {typeof entry.score === 'number' ? Math.round(entry.score) : entry.score}
                 {entry.distance && (
                   <span style={{ fontSize: '0.8em', color: '#777', display: 'block' }}>
                     ({entry.distance.toLocaleString()} km)
@@ -132,20 +127,6 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       </table>
     );
   };
-
-  // Tab style
-  const tabStyle = (isActive: boolean) => ({
-    padding: '10px 20px',
-    backgroundColor: isActive ? '#4CAF50' : '#f0f0f0',
-    color: isActive ? 'white' : '#333',
-    border: 'none',
-    borderRadius: '4px 4px 0 0',
-    cursor: 'pointer',
-    fontWeight: isActive ? 'bold' : 'normal',
-    fontFamily: `"${selectedFont}", "Comic Sans MS", cursive`,
-    marginRight: '5px',
-    transition: 'background-color 0.2s'
-  });
 
   return (
     <div style={{ 
@@ -174,31 +155,32 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         ← Back to Game
       </button>
 
+      {/* Title */}
+      {/* <h2 style={{ 
+        textAlign: 'center', 
+        marginBottom: '20px',
+        color: '#333'
+      }}>
+        All Time Leaderboard
+      </h2> */}
+
       {isLoading ? (
         <div style={{ textAlign: 'center', padding: '40px' }}>
           Loading leaderboard...
         </div>
       ) : (
         <>
-          {/* Tabs */}
-          <div style={{ 
-            display: 'flex',
-            marginBottom: '10px'
+          {/* Info about scoring */}
+                  <div style={{
+            padding: '10px',
+            backgroundColor: '#f9f9f9',
+            borderRadius: '4px',
+            fontSize: '0.9em',
+            color: '#666',
+            marginBottom: '20px'
           }}>
-            <button 
-              onClick={() => setActiveTab('daily')}
-              style={tabStyle(activeTab === 'daily')}
-            >
-              Today&apos;s Scores
-            </button>
-            <button 
-              onClick={() => setActiveTab('all-time')}
-              style={tabStyle(activeTab === 'all-time')}
-            >
-              All Time Scores
-            </button>
+            <p>All-time scores are the sum of all your daily scores.</p>
           </div>
-          
           {/* Leaderboard Table Container */}
           <div style={{ 
             maxHeight: '500px',
@@ -207,26 +189,7 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({
             border: '1px solid #ddd',
             borderRadius: '4px'
           }}>
-            {activeTab === 'daily' 
-              ? renderLeaderboardTable(dailyLeaderboard)
-              : renderLeaderboardTable(allTimeLeaderboard)
-            }
-          </div>
-          
-          {/* Info about scoring */}
-          <div style={{
-            padding: '10px',
-            backgroundColor: '#f9f9f9',
-            borderRadius: '4px',
-            fontSize: '0.9em',
-            color: '#666',
-            marginBottom: '20px'
-          }}>
-            <p>Score calculation: 100 × e<sup>(-distance/2000)</sup></p>
-            <p>Higher scores are better!</p>
-            {activeTab === 'all-time' && (
-              <p>All-time scores are the sum of all your daily scores.</p>
-            )}
+            {renderLeaderboardTable(allTimeLeaderboard)}
           </div>
         </>
       )}

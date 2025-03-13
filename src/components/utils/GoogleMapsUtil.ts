@@ -1,49 +1,83 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useState, useEffect } from 'react';
+
+// Global tracking of Google Maps loading state
+let isGoogleMapsLoading = false;
+let isGoogleMapsLoaded = false;
+let loadCallbacks: (() => void)[] = [];
+
+// Function to execute all pending callbacks
+function executeCallbacks() {
+  while (loadCallbacks.length > 0) {
+    const callback = loadCallbacks.shift();
+    if (callback) {
+      try {
+        callback();
+      } catch (error) {
+        console.error("Error executing callback after Google Maps loaded:", error);
+      }
+    }
+  }
+}
+
+// Hook to check if Google Maps is loaded
+export const useGoogleMapsLoaded = () => {
+  const [isLoaded, setIsLoaded] = useState(
+    typeof window !== 'undefined' && !!window.google && !!window.google.maps
+  );
+  
+  useEffect(() => {
+    if (isLoaded) return;
+    
+    // Check if already loaded
+    if (typeof window !== 'undefined' && window.google && window.google.maps) {
+      setIsLoaded(true);
+      return;
+    }
+    
+    // Add a callback to set loaded state when Maps loads
+    const callback = () => setIsLoaded(true);
+    loadCallbacks.push(callback);
+    
+    return () => {
+      // Remove callback on unmount
+      loadCallbacks = loadCallbacks.filter(cb => cb !== callback);
+    };
+  }, [isLoaded]);
+  
+  return { isLoaded };
+};
 
 // Function to load Google Maps API
 export const useGoogleMapsLoader = (setLoading: (loading: boolean) => void) => {
-  // Ref to track if Google Maps API is already loading or loaded
-  const googleMapsLoadingRef = useRef(false);
-  
   // Shared function to load Google Maps API
   const loadGoogleMapsAPI = useCallback((callback: () => void, callerName: string) => {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
     
     if (!apiKey) {
       console.error("Google Maps API key is not defined");
+      setLoading(false);
       return;
     }
     
     // Check if the API is already loaded
     if (window.google && window.google.maps) {
       console.log("Google Maps API already loaded, initializing", callerName);
+      isGoogleMapsLoaded = true;
       callback();
       return;
     }
     
-    // Check if already loading
-    if (googleMapsLoadingRef.current) {
+    // Register the callback to be called when Maps loads
+    loadCallbacks.push(callback);
+    
+    // If already loading, don't start another load
+    if (isGoogleMapsLoading) {
       console.log("Google Maps API is already being loaded, waiting for it...");
-      
-      // Set up an interval to check when the API is ready
-      const checkInterval = setInterval(() => {
-        if (window.google && window.google.maps) {
-          console.log("Google Maps API now available, initializing", callerName);
-          clearInterval(checkInterval);
-          callback();
-        }
-      }, 500);
-      
-      // Clear interval after 10 seconds to avoid infinite checking
-      setTimeout(() => {
-        clearInterval(checkInterval);
-      }, 10000);
-      
       return;
     }
     
     // Set loading flag
-    googleMapsLoadingRef.current = true;
+    isGoogleMapsLoading = true;
     console.log("Loading Google Maps API for", callerName);
     
     // Create a unique callback name to avoid conflicts
@@ -52,10 +86,11 @@ export const useGoogleMapsLoader = (setLoading: (loading: boolean) => void) => {
     // Use direct indexing with any
     window[callbackName] = () => {
       console.log("Google Maps API loaded via script");
-      googleMapsLoadingRef.current = false;
+      isGoogleMapsLoading = false;
+      isGoogleMapsLoaded = true;
       
-      // Call the initialization function
-      callback();
+      // Execute all registered callbacks
+      executeCallbacks();
       
       // Clean up
       delete window[callbackName];
@@ -70,7 +105,7 @@ export const useGoogleMapsLoader = (setLoading: (loading: boolean) => void) => {
     // Handle errors
     script.onerror = () => {
       console.error("Failed to load Google Maps API");
-      googleMapsLoadingRef.current = false;
+      isGoogleMapsLoading = false;
       setLoading(false);
     };
     

@@ -9,21 +9,48 @@ import ResultsView from './ResultsView';
 import LeaderboardView from './LeaderboardView';
 import { gameConfig } from '../lib/gameConfig';
 import { useGameAnalytics } from '../lib/analytics';
-import { getUserFid, getUserName } from '../lib/analytics';
+import sdk from '@farcaster/frame-sdk';
+import { submitUserGuess } from '../lib/playStatusHelpers';
 
 interface LocationGuesserViewProps {
   selectedFont: string;
   dailyLocation: Location;
+  initialGameState?: GameState;
+  initialGuess?: Guess | null;
+  onGameComplete?: (guess: Guess) => void;
 }
 
-const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({ selectedFont, dailyLocation }) => {
+const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({ 
+  selectedFont, 
+  dailyLocation, 
+  initialGameState = 'viewing',
+  initialGuess = null,
+  onGameComplete
+}) => {
   const [timeLeft, setTimeLeft] = useState(gameConfig.VIEWING_TIME_MS); // Use the configured time
-  const [gameState, setGameState] = useState<GameState>('viewing');
-  const [guess, setGuess] = useState<Guess | null>(null);
+  const [gameState, setGameState] = useState<GameState>(initialGameState);
+  const [guess, setGuess] = useState<Guess | null>(initialGuess);
   const [mapLoaded, setMapLoaded] = useState(false); // Add this state
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [sdkContext, setSdkContext] = useState<any>(null);
   const analytics = useGameAnalytics();
   
+  // Load Farcaster SDK context
+  useEffect(() => {
+    const loadSdkContext = async () => {
+      try {
+        if (sdk) {
+          const context = await sdk.context;
+          setSdkContext(context);
+        }
+      } catch (error) {
+        console.error('Error loading SDK context:', error);
+      }
+    };
+    
+    loadSdkContext();
+  }, []);
+
   // Timer effect - updates the timer in viewing state
   useEffect(() => {
     let timerId: NodeJS.Timeout | undefined;
@@ -78,62 +105,26 @@ const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({ selectedFont,
     // Track guess_submitted event
     analytics.guessSubmitted({ distance });
     
-    // Submit score to leaderboard
-    try {
-      const userFid = getUserFid();
-      const username = getUserName();
-      console.log('Submitting score to leaderboard with FID:', userFid, 'and username:', username);
+    // Use the helper function to submit the guess
+    if (sdkContext) {
+      const result = await submitUserGuess(sdkContext, guessWithDistance);
       
-      // Create a valid name that doesn't exceed 20 characters
-      let userName = "Anonymous";
-      
-      // Use Farcaster username if available, fall back to FID-based name
-      if (username) {
-        // Use the actual Farcaster username
-        userName = username;
-        // Truncate if necessary
-        if (userName.length > 30) {
-          userName = userName.slice(0, 30);
-        }
-      } else if (userFid) {
-        // Fall back to FID-based name if no username is available
-        userName = `User ${userFid.slice(0, 15)}`;
-        // Further truncate if still too long
-        if (userName.length > 30) {
-          userName = userName.slice(0, 30);
-        }
+      if (!result.success) {
+        setErrorMessage(result.error);
       }
-      
-      const leaderboardResponse = await fetch('/api/leaderboard', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: userName,
-          distance: distance,
-          fid: userFid || undefined // Ensure fid is undefined if null or empty
-        }),
-      });
-      
-      const data = await leaderboardResponse.json();
-      if (!data.success) {
-        console.error('Failed to submit score to leaderboard:', data.error);
-        
-        // Check if this is a duplicate submission error
-        if (leaderboardResponse.status === 403) {
-          setErrorMessage(data.error || "You've already played today. Your score was not saved.");
-          // Still show results but with the error message
-        }
-      }
-    } catch (error) {
-      console.error('Error submitting score:', error);
-      setErrorMessage("An error occurred while submitting your score. Please try again later.");
+    } else {
+      // Handle case where SDK context is not available
+      setErrorMessage("Unable to submit score - authentication required");
     }
     
     setGuess(guessWithDistance);
     setGameState('results');
-  }, [dailyLocation, analytics]);
+    
+    // Call the onGameComplete callback if provided
+    if (onGameComplete) {
+      onGameComplete(guessWithDistance);
+    }
+  }, [dailyLocation, analytics, sdkContext, onGameComplete]);
 
   // Handle going to next location or leaderboard
   const handleNextLocation = () => {
