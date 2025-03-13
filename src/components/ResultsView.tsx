@@ -648,7 +648,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   const handleShare = () => {
     analytics.shareClicked();
     
-    const message = `I scored ${Math.round(score)} points (${guess.distance.toLocaleString()} km away) from today's mystery location 📍. Can you beat me?\n\n`;
+    const message = `I was ${guess.distance.toLocaleString()} km away from today's mystery location 📍. Can you beat me?\n\n`;
     // URL encode the message, ensuring newlines are properly encoded
     const encodedMessage = encodeURIComponent(message);
     const encodedFrameUrl = encodeURIComponent(process.env.NEXT_PUBLIC_URL || '');
@@ -848,7 +848,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
         fontFamily: `"${selectedFont}", "Comic Sans MS", cursive`
       }}>
         {/* Your guess was <strong>{guess.distance.toLocaleString()}</strong> km away (<strong>{Math.round(score)}</strong> points) */}
-        <p style={{ fontSize: '30px' }}><b>Your guess was <strong>{guess.distance.toLocaleString()}</strong> km away</b></p>
+        <p style={{ fontSize: '30px' }}><b>You were <strong>{guess.distance.toLocaleString()}</strong> km away</b></p>
         <p style={{ color: 'rgba(0, 0, 0, 0.5)' }}> Mint to save your score on today&apos;s leaderboard</p>
 
       </div>

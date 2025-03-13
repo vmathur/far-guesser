@@ -2,7 +2,6 @@
 
 FarGuesser.
 
-P0
 - Minting
 
 ## Getting Started
