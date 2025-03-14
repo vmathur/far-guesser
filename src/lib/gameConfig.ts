@@ -19,7 +19,7 @@ export const gameConfig = {
    * - 30000 = 30 seconds
    * - 60000 = 1 minute
    */
-  VIEWING_TIME_MS: 20000,
+  VIEWING_TIME_MS: 30000,
   
   // Add other game configuration parameters here as needed
 };
