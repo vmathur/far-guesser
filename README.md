@@ -1,9 +1,9 @@
 # 🖼️ FarGuesser.
 
 FarGuesser.
-
+- Button animations
+- refactor and get rid of code
 - Add metadata to minting
-- Animation on rule screen
 
 Nice to have
 - Leaderboard and collectible view in rule screen

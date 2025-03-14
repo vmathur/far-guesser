@@ -1,7 +1,6 @@
 import { createConfig, http, WagmiProvider } from "wagmi";
 import { base, degen, mainnet, optimism } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { farcasterFrame } from "@farcaster/frame-wagmi-connector";
 
 export const config = createConfig({
   chains: [base, optimism, mainnet, degen],
@@ -13,8 +12,8 @@ export const config = createConfig({
   },
   // Disable auto-connect by using an empty connectors array initially.
   // When you want to connect, you can use the connector explicitly.
-  // connectors: []
-  connectors: [farcasterFrame()]
+  connectors: []
+  // connectors: [farcasterFrame()]
 });
 
 const queryClient = new QueryClient();

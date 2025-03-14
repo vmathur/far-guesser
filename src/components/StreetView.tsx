@@ -164,7 +164,7 @@ const StreetView: React.FC<StreetViewProps> = ({
             backgroundColor: '#f0f0f0',
             zIndex: 10
           }}>
-            Loading Street View...
+            Loading mystery location...
           </div>
         )}
       </div>

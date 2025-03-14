@@ -183,11 +183,39 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
   const styles: Record<string, CSSProperties> = {
     container: {
       textAlign: 'center' as const,
+      padding: '0',
+      margin: '0',
+      width: '100%',
+      height: '100vh',
+      backgroundImage: 'url("/map.jpg")',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      overflow: 'hidden',
+    },
+    overlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(255, 255, 255, 0.85)',
+      zIndex: 1,
+    },
+    contentContainer: {
+      position: 'relative',
+      zIndex: 2,
       padding: '30px',
-      backgroundColor: '#ffffff',
-      borderRadius: '12px',
       maxWidth: '800px',
-      margin: '0 auto',
+      borderRadius: '12px',
     },
     title: {
       textAlign: 'center' as const,
@@ -199,13 +227,13 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
     },
     rulesContainer: {
       textAlign: 'left',
-      backgroundColor: 'white',
+      // backgroundColor: 'rgba(255, 255, 255, 0.7)',
       borderRadius: '10px',
       marginBottom: '30px',
     },
     rule: {
       position: 'relative' as const,
-      backgroundColor: 'white',
+      // backgroundColor: 'rgba(255, 255, 255, 0.7)',
       padding: '15px 15px 15px 15px',
       margin: '10px 0',
       borderRadius: '10px',
@@ -264,6 +292,19 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
     }
   };
 
+  // Add useEffect to handle body overflow
+  useEffect(() => {
+    // Add overflow: hidden to both html and body
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+
+    // Cleanup function to remove the styles when component unmounts
+    return () => {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    };
+  }, []);
+
   const handleSignIn = async () => {
     try {
       const nonce = await fetch('/api/auth/csrf').then(res => res.json()).then(data => data.csrfToken);
@@ -291,62 +332,65 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>🔎 FarGuesser</h1>
-      
-      <div style={styles.rulesContainer}>
-        <p style={styles.rule}>
-          1. Explore a mystery location for {Math.round(gameConfig.VIEWING_TIME_MS / 1000)} seconds
-        </p>
-        <p style={styles.rule}>
-          2. Guess where it is on the map
-        </p>
-        <p style={styles.rule}>
-          3. Score points for being close to the actual location. New location each day
-        </p>
-      </div>
-      
-      {isLoading ? (
-        <div style={styles.loadingIndicator}>Loading...</div>
-      ) : (
-        <>
-          <button 
-            style={styles.playButton}
-            onClick={playStatus?.hasPlayed ? undefined : handlePlayClick}
-            onMouseOver={(e) => {
-              if (!playStatus?.hasPlayed) {
-                e.currentTarget.style.backgroundColor = '#45a049';
-                e.currentTarget.style.transform = 'scale(1.05)';
-              }
-            }}
-            onMouseOut={(e) => {
-              if (!playStatus?.hasPlayed) {
-                e.currentTarget.style.backgroundColor = '#4CAF50';
-                e.currentTarget.style.transform = 'scale(1)';
-              }
-            }}
-            disabled={playStatus?.hasPlayed}
-          >
-            Play
-          </button>
-          
-          {playStatus?.hasPlayed && (
-            <div style={styles.countdown}>
-              <p>Next round: {countdown}</p>
-            </div>
-          )}
-        </>
-      )}
-      
-      {!userFid && (
-        <div style={{ marginTop: '20px' }}>
-          <button
-            onClick={handleSignIn}
-            style={styles.signInButton}
-          >
-            Connect to Farcaster
-          </button>
+      <div style={styles.overlay}></div>
+      <div style={styles.contentContainer}>
+        {/* <h1 style={styles.title}>🔎 FarGuesser</h1> */}
+        
+        <div style={styles.rulesContainer}>
+          <p style={styles.rule}>
+            1. Explore a mystery location for {Math.round(gameConfig.VIEWING_TIME_MS / 1000)} seconds
+          </p>
+          <p style={styles.rule}>
+            2. Guess where it is on the map
+          </p>
+          <p style={styles.rule}>
+            3. Score points for being close to the actual location. New location each day
+          </p>
         </div>
-      )}
+        
+        {isLoading ? (
+          <div style={styles.loadingIndicator}>Loading...</div>
+        ) : (
+          <>
+            <button 
+              style={styles.playButton}
+              onClick={playStatus?.hasPlayed ? undefined : handlePlayClick}
+              onMouseOver={(e) => {
+                if (!playStatus?.hasPlayed) {
+                  e.currentTarget.style.backgroundColor = '#45a049';
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                }
+              }}
+              onMouseOut={(e) => {
+                if (!playStatus?.hasPlayed) {
+                  e.currentTarget.style.backgroundColor = '#4CAF50';
+                  e.currentTarget.style.transform = 'scale(1)';
+                }
+              }}
+              disabled={playStatus?.hasPlayed}
+            >
+              Play
+            </button>
+            
+            {playStatus?.hasPlayed && (
+              <div style={styles.countdown}>
+                <p>Next round: {countdown}</p>
+              </div>
+            )}
+          </>
+        )}
+        
+        {!userFid && (
+          <div style={{ marginTop: '20px' }}>
+            <button
+              onClick={handleSignIn}
+              style={styles.signInButton}
+            >
+              Connect to Farcaster
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

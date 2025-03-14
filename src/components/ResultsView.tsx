@@ -7,7 +7,9 @@ import sdk from '@farcaster/frame-sdk';
 import { useGameAnalytics } from '../lib/analytics';
 import {
   useSendTransaction,
+  useConnect
 } from "wagmi";
+import { farcasterFrame } from "@farcaster/frame-wagmi-connector";
 // Calculate score based on distance (kilometers)
 const calculateScore = (distanceInKm: number): number => {
   // Score formula: 100 * e^(-distance/2000)
@@ -110,6 +112,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     isError: isSendTxError,
     isPending: isSendTxPending,
   } = useSendTransaction();
+  const {connect} = useConnect()
   
   
   // Load Google Maps API
@@ -669,6 +672,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   };
 
   const handleMint = useCallback(() => {
+    connect({connector: farcasterFrame()})
     sendTransaction(
       {
         // call mint() on Yoink contract
