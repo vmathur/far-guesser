@@ -2,7 +2,13 @@
 
 FarGuesser.
 
-- Minting
+- Add metadata to minting
+- Fix time remaining
+- Animation on rule screen
+- Change notification message
+
+Nice to have
+- Leaderboard and collectible view in rule screen
 
 ## Getting Started
 

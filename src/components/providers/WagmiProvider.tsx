@@ -13,8 +13,8 @@ export const config = createConfig({
   },
   // Disable auto-connect by using an empty connectors array initially.
   // When you want to connect, you can use the connector explicitly.
-  connectors: []
-  // connectors: [farcasterFrame()]
+  // connectors: []
+  connectors: [farcasterFrame()]
 });
 
 const queryClient = new QueryClient();

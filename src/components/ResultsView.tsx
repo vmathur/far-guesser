@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Guess, Location } from './types/LocationGuesserTypes';
 import { useGoogleMapsLoader, useGoogleMapsLoaded, calculateDistance } from './utils/GoogleMapsUtil';
 import sdk from '@farcaster/frame-sdk';
 import { useGameAnalytics } from '../lib/analytics';
-
+import {
+  useSendTransaction,
+} from "wagmi";
 // Calculate score based on distance (kilometers)
 const calculateScore = (distanceInKm: number): number => {
   // Score formula: 100 * e^(-distance/2000)
@@ -99,6 +101,13 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     minutes: 0, 
     seconds: 0 
   });
+
+  const {
+    sendTransaction,
+    error: sendTxError,
+    isError: isSendTxError,
+    isPending: isSendTxPending,
+  } = useSendTransaction();
   
   
   // Load Google Maps API
@@ -657,10 +666,21 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     sdk.actions.openUrl(`https://warpcast.com/~/compose?text=${encodedMessage}&embeds[]=${encodedFrameUrl}`);
   };
 
-  const handleMint = () => {
-    // Navigate to the leaderboard view using the onNextLocation callback
-    alert('minted')
-  };
+  const handleMint = useCallback(() => {
+    sendTransaction(
+      {
+        // call mint() on Yoink contract
+        to: "0x247757adefbf623b7762102da57ec881de308eea",
+        data: '0x1249c58b', // Function selector for mint()
+        value: BigInt("10000000000000")
+      },
+      {
+        onSuccess: (hash) => {
+          console.log('minted '+hash)
+        },
+      }
+    );
+  }, [sendTransaction]);
 
   // Render the leaderboard section
   const renderLeaderboardPreview = () => {
@@ -849,7 +869,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({
       }}>
         {/* Your guess was <strong>{guess.distance.toLocaleString()}</strong> km away (<strong>{Math.round(score)}</strong> points) */}
         <p style={{ fontSize: '30px' }}><b>You were <strong>{guess.distance.toLocaleString()}</strong> km away</b></p>
-        <p style={{ color: 'rgba(0, 0, 0, 0.5)' }}> Mint to save your score on today&apos;s leaderboard</p>
 
       </div>
       <div style={{ marginBottom: '20px' }}>
