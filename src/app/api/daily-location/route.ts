@@ -68,14 +68,14 @@ export async function GET(request: Request) {
     // Send a notification to all users who have added the frame
     try {
       console.log('Sending notifications to all subscribers...');
-      // const notificationResult = await sendNotificationToAllSubscribers(
-      //   `${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} round begins now`,
-      //   "The mystery location awaits"
-      // );
       const notificationResult = await sendNotificationToAllSubscribers(
-        `New round begins now`,
+        `${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} round begins now`,
         "The mystery location awaits"
       );
+      // const notificationResult = await sendNotificationToAllSubscribers(
+      //   `New round begins now`,
+      //   "The mystery location awaits"
+      // );
       
       console.log(`Sent notifications to ${notificationResult.totalUsers} users: ` +
         `${notificationResult.successCount} success, ` +

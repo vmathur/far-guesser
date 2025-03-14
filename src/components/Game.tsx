@@ -23,6 +23,7 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
   const [gameFlow, setGameFlow] = useState<'loading' | 'rules' | 'playing' | 'results'>('loading');
   const [userGuess, setUserGuess] = useState<any>(null);
   const [sdkContext, setSdkContext] = useState<any>(null);
+  const [timeUntilNextRound, setTimeUntilNextRound] = useState<number | undefined>(undefined);
   const selectedFont = 'Patrick Hand';
   const analytics = useGameAnalytics();
   
@@ -84,6 +85,11 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
         return;
       }
       
+      // Store the timeUntilNextRound value
+      if (playStatus.timeUntilNextRound !== undefined) {
+        setTimeUntilNextRound(playStatus.timeUntilNextRound);
+      }
+      
       if (playStatus.hasPlayed && playStatus.userGuess) {
         // User has played and we have their guess - show results
         setUserGuess(playStatus.userGuess);
@@ -132,6 +138,7 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
             dailyLocation={dailyLocation}
             initialGameState="results"
             initialGuess={userGuess}
+            timeUntilNextRound={timeUntilNextRound}
           />
         );
       default:

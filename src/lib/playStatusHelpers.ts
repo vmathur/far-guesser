@@ -13,6 +13,7 @@ export async function checkUserPlayStatus(sdkContext: any): Promise<{
   hasPlayed: boolean;
   userGuess: any | null;
   error: string | null;
+  timeUntilNextRound?: number;
 }> {
   try {
     // Get FID from SDK context
@@ -39,12 +40,16 @@ export async function checkUserPlayStatus(sdkContext: any): Promise<{
     });
     const data = await response.json();
     
+    // Extract timeUntilNextRound from API response
+    const timeUntilNextRound = data.timeUntilNextRound;
+    
     if (!data.hasPlayed) {
       console.log(`User ${userFid} has not played today`);
       return { 
         hasPlayed: false, 
         userGuess: null,
-        error: null 
+        error: null,
+        timeUntilNextRound
       };
     }
     
@@ -61,14 +66,16 @@ export async function checkUserPlayStatus(sdkContext: any): Promise<{
       return { 
         hasPlayed: true, 
         userGuess: guessData.guess,
-        error: null
+        error: null,
+        timeUntilNextRound
       };
     } else {
       console.log('No previous guess found despite hasPlayed=true');
       return { 
         hasPlayed: true, 
         userGuess: null,
-        error: 'Could not retrieve previous guess'
+        error: 'Could not retrieve previous guess',
+        timeUntilNextRound
       };
     }
   } catch (error) {

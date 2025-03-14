@@ -21,6 +21,7 @@ interface ResultsViewProps {
   onNextLocation: () => void;
   selectedFont?: string;
   errorMessage?: string | null;
+  timeUntilNextRound?: number;
 }
 
 // Define a type for the SDK context
@@ -69,7 +70,8 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   actualLocation, 
   onNextLocation,
   selectedFont = 'Chalkboard SE',
-  errorMessage = null
+  errorMessage = null,
+  timeUntilNextRound
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const googleMapRef = useRef<GoogleMapsInstance | null>(null);
@@ -97,7 +99,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   
   // Add state for the countdown timer
   const [timeRemaining, setTimeRemaining] = useState<{ hours: number; minutes: number; seconds: number }>({ 
-    hours: 7, 
+    hours: 24, 
     minutes: 0, 
     seconds: 0 
   });
@@ -813,13 +815,21 @@ const ResultsView: React.FC<ResultsViewProps> = ({
 
   // Add a countdown timer effect
   useEffect(() => {
-    // For the demo, set the end time to 7 hours from now
+    // Calculate end time based on timeUntilNextRound (in milliseconds) or default to 7 hours
+    const now = new Date();
     const endTime = new Date();
-    endTime.setHours(endTime.getHours() + 7);
+    
+    if (timeUntilNextRound !== undefined) {
+      // Add timeUntilNextRound milliseconds to the current time
+      endTime.setTime(now.getTime() + timeUntilNextRound);
+    } else {
+      // Fallback to 7 hours if timeUntilNextRound is not provided
+      endTime.setHours(endTime.getHours() + 24);
+    }
     
     const timerInterval = setInterval(() => {
-      const now = new Date();
-      const diff = endTime.getTime() - now.getTime();
+      const currentTime = new Date();
+      const diff = endTime.getTime() - currentTime.getTime();
       
       if (diff <= 0) {
         // Timer completed
@@ -838,7 +848,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     
     // Cleanup
     return () => clearInterval(timerInterval);
-  }, []);
+  }, [timeUntilNextRound]);
 
   return (
     <div style={{ 

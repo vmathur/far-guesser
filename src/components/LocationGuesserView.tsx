@@ -18,6 +18,7 @@ interface LocationGuesserViewProps {
   initialGameState?: GameState;
   initialGuess?: Guess | null;
   onGameComplete?: (guess: Guess) => void;
+  timeUntilNextRound?: number;
 }
 
 const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({ 
@@ -25,7 +26,8 @@ const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({
   dailyLocation, 
   initialGameState = 'viewing',
   initialGuess = null,
-  onGameComplete
+  onGameComplete,
+  timeUntilNextRound
 }) => {
   const [timeLeft, setTimeLeft] = useState(gameConfig.VIEWING_TIME_MS); // Use the configured time
   const [gameState, setGameState] = useState<GameState>(initialGameState);
@@ -165,6 +167,7 @@ const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({
             onNextLocation={handleNextLocation}
             selectedFont={selectedFont}
             errorMessage={errorMessage}
+            timeUntilNextRound={timeUntilNextRound}
           />
         ) : null;
       case 'leaderboard':
