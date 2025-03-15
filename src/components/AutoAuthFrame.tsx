@@ -193,7 +193,7 @@ export default function AutoAuthFrame() {
         });
         
         // Tell the SDK we're ready
-        sdk.actions.ready({});
+        sdk.actions.ready({disableNativeGestures: true});
       } catch (error) {
         console.error("SDK initialization error:", error);
       }

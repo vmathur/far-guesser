@@ -216,7 +216,7 @@ const GuessingMap: React.FC<GuessingMapProps> = ({ onGuessSubmitted }) => {
       <motion.button
         onClick={handleSubmitGuess}
         disabled={!guess || !marker || submitting}
-        className={`font-bold py-3 px-8 rounded-lg text-lg ${
+        className={`font-bold py-3 px-8 rounded-lg text-lg select-none touch-none ${
           (!marker) || submitting ? "bg-gray-400 text-gray-200" : "bg-green-500 text-white"
         }`}
         animate={{ 

@@ -355,7 +355,7 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
           <>
             <motion.button
                 onClick={playStatus?.hasPlayed ? undefined : handlePlayClick}
-                className="bg-green-500 text-white font-bold py-3 px-8 rounded-lg text-lg"
+                className="bg-green-500 text-white font-bold py-3 px-8 rounded-lg text-lg select-none touch-none"
                 initial={{ 
                   boxShadow: "0px 5px 0px  rgba(0, 0, 0, 0.5), 0px 5px 10px rgba(0, 0, 0, 0.5)" 
                 }}

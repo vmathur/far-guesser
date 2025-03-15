@@ -1,6 +1,6 @@
 # 🖼️ FarGuesser.
 
-FarGuesser.
+FarGuesser
 - refactor and get rid of code
   - change how how notifications works
   - optimize network calls
