@@ -796,7 +796,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '15px' }}>
           <motion.button
             onClick={onNextLocation}
-            className="bg-gray-300 text-black font-bold py-3 px-8 rounded-lg text-lg select-none touch-none"
+            className="bg-gray-200 text-black font-bold py-3 px-8 rounded-lg text-lg select-none touch-none"
              initial={{ 
                boxShadow: "0px 5px 0px  rgba(0, 0, 0, 0.5), 0px 5px 10px rgba(0, 0, 0, 0.5)" 
              }}
@@ -886,7 +886,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
 
             <motion.button
                 onClick={handleMint}
-                className="bg-gray-300 text-black font-bold py-3 px-8 rounded-lg text-lg mr-10 select-none touch-none"
+                className="bg-gray-200 text-black font-bold py-3 px-8 rounded-lg text-lg mr-10 select-none touch-none"
                 initial={{ 
                   boxShadow: "0px 5px 0px  rgba(0, 0, 0, 0.5), 0px 5px 10px rgba(0, 0, 0, 0.5)" 
                 }}
@@ -900,7 +900,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
             </motion.button>
             <motion.button
                 onClick={handleShare}
-                className="bg-gray-300 text-black  font-bold py-3 px-8 rounded-lg text-lg select-none touch-none"
+                className="bg-gray-200 text-black  font-bold py-3 px-8 rounded-lg text-lg select-none touch-none"
                 initial={{ 
                   boxShadow: "0px 5px 0px  rgba(0, 0, 0, 0.5), 0px 5px 10px rgba(0, 0, 0, 0.5)" 
                 }}
