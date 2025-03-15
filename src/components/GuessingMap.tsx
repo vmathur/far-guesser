@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useGoogleMapsLoader } from './utils/GoogleMapsUtil';
 import { Guess } from './types/LocationGuesserTypes';
+import { motion } from 'framer-motion';
 
 interface GuessingMapProps {
   onGuessSubmitted: (guess: Guess) => void;
@@ -212,24 +213,36 @@ const GuessingMap: React.FC<GuessingMapProps> = ({ onGuessSubmitted }) => {
         ></div>
       </div>
       
-      <button
+      <motion.button
         onClick={handleSubmitGuess}
-        disabled={!guess || !marker || submitting} // Also disable when submitting
-        style={{
-          padding: '15px 30px',
-          backgroundColor: (guess && marker && !submitting) ? '#4CAF50' : '#cccccc',
-          color: 'white',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: (guess && marker && !submitting) ? 'pointer' : 'not-allowed',
-          fontSize: '18px',
-          fontWeight: 'bold',
-          boxShadow: (guess && marker && !submitting) ? '0 4px 8px rgba(0, 0, 0, 0.2)' : 'none',
-          transition: 'background-color 0.2s ease'
+        disabled={!guess || !marker || submitting}
+        className={`font-bold py-3 px-8 rounded-lg text-lg ${
+          (!marker) || submitting ? "bg-gray-400 text-gray-200" : "bg-green-500 text-white"
+        }`}
+        animate={{ 
+          y: (!marker) || submitting ? 5 : 0,
+          boxShadow: (!marker) || submitting
+            ? "0px 0px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px rgba(0, 0, 0, 0.2)"
+            : "0px 5px 0px rgba(0, 0, 0, 0.5), 0px 5px 10px rgba(0, 0, 0, 0.5)"
         }}
+        whileHover={(!marker) || submitting 
+          ? {} 
+          : { 
+              scale: 1.05,
+              transition: { duration: 0.2 }
+            }
+        }
+        whileTap={(!marker) || submitting 
+          ? {} 
+          : { 
+              y: 5,
+              boxShadow: "0px 0px 0px rgba(0, 0, 0, 0.5), 0px 0px 0px rgba(0, 0, 0, 0.5)",
+              transition: { duration: 0.1 }
+            }
+        }
       >
         {submitting ? 'Loading...' : 'Go'}
-      </button>
+      </motion.button>
     </div>
   );
 };

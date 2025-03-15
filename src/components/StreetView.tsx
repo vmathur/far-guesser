@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Location } from './types/LocationGuesserTypes';
 import { useGoogleMapsLoader } from './utils/GoogleMapsUtil';
+import { motion } from 'framer-motion';
 
 interface StreetViewProps {
   currentLocation: Location;
@@ -175,31 +176,19 @@ const StreetView: React.FC<StreetViewProps> = ({
         justifyContent: 'center',
         marginBottom: '20px'
       }}>
-        <button
+        <motion.button
           onClick={onTimeEnd}
-          style={{
-            padding: '12px 25px',
-            backgroundColor: '#4CAF50',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '16px',
-            fontWeight: 'bold',
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-            transition: 'all 0.2s ease'
+          className="bg-green-500 text-white font-bold py-3 px-8 rounded-lg text-lg"
+          initial={{ 
+            boxShadow: "0px 5px 0px  rgba(0, 0, 0, 0.5), 0px 5px 10px rgba(0, 0, 0, 0.5)" 
           }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = '#45a049';
-            e.currentTarget.style.transform = 'scale(1.05)';
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = '#4CAF50';
-            e.currentTarget.style.transform = 'scale(1)';
-          }}
-        >
+          whileTap={{ 
+            y: 5,
+            boxShadow: "0px 0px 0px  rgba(0, 0, 0, 0.5), 0px 0px 0px rgba(0, 0, 0, 0.5)",
+            transition: { duration: 0.1 }
+          }}>
           Next
-        </button>
+        </motion.button>
       </div>
     </div>
   );

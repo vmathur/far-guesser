@@ -10,6 +10,7 @@ import {
   useConnect
 } from "wagmi";
 import { farcasterFrame } from "@farcaster/frame-wagmi-connector";
+import { motion } from 'framer-motion';
 // Calculate score based on distance (kilometers)
 const calculateScore = (distanceInKm: number): number => {
   // Score formula: 100 * e^(-distance/2000)
@@ -793,25 +794,20 @@ const ResultsView: React.FC<ResultsViewProps> = ({
         )}
         
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '15px' }}>
-          <button 
+          <motion.button
             onClick={onNextLocation}
-            onMouseEnter={() => setAllTimeScoresButtonHovered(true)}
-            onMouseLeave={() => setAllTimeScoresButtonHovered(false)}
-            style={{
-              backgroundColor: allTimeScoresButtonHovered ? 'rgb(220, 220, 220)' : 'rgb(240, 240, 240)',
-              color: 'black',
-              border: 'none',
-              borderRadius: '4px',
-              padding: '8px 16px',
-              cursor: 'pointer',
-              fontFamily: selectedFont,
-              fontSize: '1rem',
-              transition: 'background-color 0.2s ease-in-out',
-              boxShadow: allTimeScoresButtonHovered ? '0 2px 4px rgba(0, 0, 0, 0.1)' : 'none'
-            }}
-          >
+            className="bg-gray-300 text-black font-bold py-3 px-8 rounded-lg text-lg"
+             initial={{ 
+               boxShadow: "0px 5px 0px  rgba(0, 0, 0, 0.5), 0px 5px 10px rgba(0, 0, 0, 0.5)" 
+             }}
+             whileTap={{ 
+               y: 5,
+               boxShadow: "0px 0px 0px  rgba(0, 0, 0, 0.5), 0px 0px 0px rgba(0, 0, 0, 0.5)",
+               transition: { duration: 0.1 }
+             }}
+           >
             All time scores →
-          </button>
+          </motion.button>
         </div>
       </div>
     );
@@ -887,47 +883,35 @@ const ResultsView: React.FC<ResultsViewProps> = ({
       </div>
       <div style={{ marginBottom: '20px' }}>
           <div>
-            <button
-              onClick={handleMint}
-              onMouseEnter={() => setMintButtonHovered(true)}
-              onMouseLeave={() => setMintButtonHovered(false)}
-              style={{
-                padding: '10px 30px',
-                backgroundColor: mintButtonHovered ? 'rgb(220, 220, 220)' : 'rgb(240, 240, 240)',
-                color: 'black',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '16px',
-                fontWeight: 'bold',
-                marginRight: '40px',
-                transition: 'all 0.2s ease-in-out',
-                transform: mintButtonHovered ? 'translateY(-2px)' : 'translateY(0)',
-                boxShadow: mintButtonHovered ? '0 4px 8px rgba(0, 0, 0, 0.1)' : 'none'
-              }}
-            >
-            Mint
-            </button>
-            <button
-              onClick={handleShare}
-              onMouseEnter={() => setShareButtonHovered(true)}
-              onMouseLeave={() => setShareButtonHovered(false)}
-              style={{
-                padding: '10px 30px',
-                backgroundColor: shareButtonHovered ? 'rgb(220, 220, 220)' : 'rgb(240, 240, 240)',
-                color: 'black',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '16px',
-                fontWeight: 'bold',
-                transition: 'all 0.2s ease-in-out',
-                transform: shareButtonHovered ? 'translateY(-2px)' : 'translateY(0)',
-                boxShadow: shareButtonHovered ? '0 4px 8px rgba(0, 0, 0, 0.1)' : 'none'
-              }}
-            >
-            Share
-            </button>
+
+            <motion.button
+                onClick={handleMint}
+                className="bg-gray-300 text-black font-bold py-3 px-8 rounded-lg text-lg mr-10"
+                initial={{ 
+                  boxShadow: "0px 5px 0px  rgba(0, 0, 0, 0.5), 0px 5px 10px rgba(0, 0, 0, 0.5)" 
+                }}
+                whileTap={{ 
+                  y: 5,
+                  boxShadow: "0px 0px 0px  rgba(0, 0, 0, 0.5), 0px 0px 0px rgba(0, 0, 0, 0.5)",
+                  transition: { duration: 0.1 }
+                }}
+              >
+                Mint
+            </motion.button>
+            <motion.button
+                onClick={handleShare}
+                className="bg-gray-300 text-black  font-bold py-3 px-8 rounded-lg text-lg"
+                initial={{ 
+                  boxShadow: "0px 5px 0px  rgba(0, 0, 0, 0.5), 0px 5px 10px rgba(0, 0, 0, 0.5)" 
+                }}
+                whileTap={{ 
+                  y: 5,
+                  boxShadow: "0px 0px 0px  rgba(0, 0, 0, 0.5), 0px 0px 0px rgba(0, 0, 0, 0.5)",
+                  transition: { duration: 0.1 }
+                }}
+              >
+                Share
+            </motion.button>
           </div>
         </div>
       

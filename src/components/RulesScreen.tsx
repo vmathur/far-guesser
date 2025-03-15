@@ -4,6 +4,7 @@ import { useSession, signIn } from 'next-auth/react';
 import sdk from '@farcaster/frame-sdk';
 import { useGameAnalytics } from '~/lib/analytics';
 import { gameConfig } from '~/lib/gameConfig';
+import { motion } from 'framer-motion';
 
 interface RulesScreenProps {
   onPlay: () => void;
@@ -352,25 +353,20 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
           <div style={styles.loadingIndicator}>Loading...</div>
         ) : (
           <>
-            <button 
-              style={styles.playButton}
-              onClick={playStatus?.hasPlayed ? undefined : handlePlayClick}
-              onMouseOver={(e) => {
-                if (!playStatus?.hasPlayed) {
-                  e.currentTarget.style.backgroundColor = '#45a049';
-                  e.currentTarget.style.transform = 'scale(1.05)';
-                }
-              }}
-              onMouseOut={(e) => {
-                if (!playStatus?.hasPlayed) {
-                  e.currentTarget.style.backgroundColor = '#4CAF50';
-                  e.currentTarget.style.transform = 'scale(1)';
-                }
-              }}
-              disabled={playStatus?.hasPlayed}
-            >
-              Play
-            </button>
+            <motion.button
+                onClick={playStatus?.hasPlayed ? undefined : handlePlayClick}
+                className="bg-green-500 text-white font-bold py-3 px-8 rounded-lg text-lg"
+                initial={{ 
+                  boxShadow: "0px 5px 0px  rgba(0, 0, 0, 0.5), 0px 5px 10px rgba(0, 0, 0, 0.5)" 
+                }}
+                whileTap={{ 
+                  y: 5,
+                  boxShadow: "0px 0px 0px  rgba(0, 0, 0, 0.5), 0px 0px 0px rgba(0, 0, 0, 0.5)",
+                  transition: { duration: 0.1 }
+                }}
+              >
+                Play
+            </motion.button>
             
             {playStatus?.hasPlayed && (
               <div style={styles.countdown}>

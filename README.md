@@ -1,13 +1,14 @@
 # 🖼️ FarGuesser.
 
 FarGuesser.
-- Button animations
 - refactor and get rid of code
+  - change how how notifications works
+  - optimize network calls
 - Add metadata to minting
 
-Nice to have
-- Leaderboard and collectible view in rule screen
-
+maybe:
+- add click on map to show username
+- show collected nfts
 ## Getting Started
 
 This is a [NextJS](https://nextjs.org/) + TypeScript + React app.
