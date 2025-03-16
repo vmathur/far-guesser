@@ -49,8 +49,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
         if (fid) {
           headers.append('X-Farcaster-User-FID', fid.toString());
         }
-        console.log('yo')
-        console.log('fid', fid);
+
         const response = await fetch('/api/leaderboard?type=daily&include_guesses=true', {
           headers
         });

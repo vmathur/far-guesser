@@ -148,26 +148,7 @@ export async function submitUserGuess(
         error: data.error || "Failed to submit score to leaderboard"
       };
     }
-    
-    // Store the user's guess data along with their play record
-    // This is separate from leaderboard submission and should happen even if the leaderboard submission fails
-    // except in the case of a duplicate submission
-    if (fid && leaderboardResponse.status !== 403) {
-      try {
-        await fetch('/api/record-play', {
-          method: 'POST',
-          headers: headers,
-          body: JSON.stringify({
-            fid: fid.toString(),
-            guessData: guess
-          }),
-        });
-      } catch (recordError) {
-        console.error('Error recording play details:', recordError);
-        // Don't block the user flow if this fails
-      }
-    }
-    
+        
     return {
       success: true,
       error: null
