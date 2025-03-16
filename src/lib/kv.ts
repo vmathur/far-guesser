@@ -38,13 +38,19 @@ const createRedisClient = () => {
 
 const redis = createRedisClient();
 
-function getUserNotificationDetailsKey(fid: number): string {
-  return `far-guesser-notifications:user:${fid}`;
+// Consolidated user data interface
+interface ConsolidatedUserData {
+  notification?: FrameNotificationDetails;
+  guess?: {
+    position: { lat: number; lng: number };
+    distance: number;
+  };
+  lastRoundPlayed?: number;
 }
 
-// Get the prefix for user notification keys
-function getUserNotificationKeysPrefix(): string {
-  return `far-guesser-notifications:user:`;
+// Get the key for consolidated user data
+function getUserDataKey(fid: number): string {
+  return `far-guesser:user:${fid}`;
 }
 
 /**
@@ -53,29 +59,27 @@ function getUserNotificationKeysPrefix(): string {
  */
 export async function getAllSubscribedUserFids(): Promise<number[]> {
   try {
-    // In Upstash Redis SDK, scan returns { keys: string[], cursor: number }
-    // We need to use scanIterator for patterns
-    const prefix = getUserNotificationKeysPrefix();
+    const userKeys = await redis.keys('far-guesser:user:*');
     
-    // Use redis.keys instead of scan for simplicity
-    // Note: In a production app with many users, you might want to paginate this
-    const userKeys = await redis.keys(`${prefix}*`);
-    
-    if (!userKeys || !Array.isArray(userKeys)) {
+    if (!userKeys || !Array.isArray(userKeys) || userKeys.length === 0) {
       console.log('No user keys found or unexpected response format:', userKeys);
       return [];
     }
     
-    // Extract the FIDs from the keys
-    return userKeys.map(key => {
-      // Keys from scan are strings
-      if (typeof key === 'string') {
-        // Extract the FID from the key format "far-guesser-notifications:user:123"
-        const fidStr = key.split(':').pop();
-        return parseInt(fidStr || '0', 10);
-      }
-      return 0;
-    }).filter(fid => fid > 0); // Filter out any invalid FIDs
+    // Get all users with notification data
+    const userDataPromises = userKeys.map(key => {
+      const fidStr = key.split(':').pop();
+      const fid = parseInt(fidStr || '0', 10);
+      return redis.get<ConsolidatedUserData>(key).then(data => ({ fid, data }));
+    });
+    
+    const userData = await Promise.all(userDataPromises);
+    
+    // Filter for users that have notification details
+    return userData
+      .filter(item => item.data && item.data.notification)
+      .map(item => item.fid)
+      .filter(fid => fid > 0);
   } catch (error) {
     console.error('Error getting subscribed user FIDs:', error);
     return [];
@@ -85,9 +89,8 @@ export async function getAllSubscribedUserFids(): Promise<number[]> {
 export async function getUserNotificationDetails(
   fid: number
 ): Promise<FrameNotificationDetails | null> {
-  return await redis.get<FrameNotificationDetails>(
-    getUserNotificationDetailsKey(fid)
-  );
+  const userData = await redis.get<ConsolidatedUserData>(getUserDataKey(fid));
+  return userData?.notification || null;
 }
 
 export async function setUserNotificationDetails(
@@ -95,13 +98,22 @@ export async function setUserNotificationDetails(
   notificationDetails: FrameNotificationDetails
 ): Promise<void> {
   console.log('setting notification details for', fid, notificationDetails);
-  await redis.set(getUserNotificationDetailsKey(fid), notificationDetails);
+  
+  // Update consolidated data
+  const userData = await redis.get<ConsolidatedUserData>(getUserDataKey(fid)) || {} as ConsolidatedUserData;
+  userData.notification = notificationDetails;
+  await redis.set(getUserDataKey(fid), userData);
 }
 
 export async function deleteUserNotificationDetails(
   fid: number
 ): Promise<void> {
-  await redis.del(getUserNotificationDetailsKey(fid));
+  // Update consolidated data by removing notification field
+  const userData = await redis.get<ConsolidatedUserData>(getUserDataKey(fid));
+  if (userData) {
+    delete userData.notification;
+    await redis.set(getUserDataKey(fid), userData);
+  }
 }
 
 // Leaderboard functions
@@ -222,7 +234,7 @@ export async function resetAllLeaderboards(): Promise<void> {
   ]);
 }
 
-// New function to reset all game data
+// Function to reset all game data
 export async function resetAll(): Promise<void> {
   try {
     // 1. Reset all-time leaderboard
@@ -234,22 +246,16 @@ export async function resetAll(): Promise<void> {
       await Promise.all(dailyLeaderboardKeys.map(key => redis.del(key)));
     }
     
-    // 3. Delete all play statuses
-    const playStatusKeys = await redis.keys('far-guesser:user-play:*');
-    if (playStatusKeys && playStatusKeys.length > 0) {
-      await Promise.all(playStatusKeys.map(key => redis.del(key)));
+    // 3. Delete consolidated user data
+    const consolidatedUserKeys = await redis.keys('far-guesser:user:*');
+    if (consolidatedUserKeys && consolidatedUserKeys.length > 0) {
+      await Promise.all(consolidatedUserKeys.map(key => redis.del(key)));
     }
     
-    // 4. Delete all notifications
-    const notificationKeys = await redis.keys(`${getUserNotificationKeysPrefix()}*`);
-    if (notificationKeys && notificationKeys.length > 0) {
-      await Promise.all(notificationKeys.map(key => redis.del(key)));
-    }
-    
-    // 5. Reset location index to 0
+    // 4. Reset location index to 0
     await redis.set(LOCATION_INDEX_KEY, 0);
     
-    // 6. Update last location update time to current time
+    // 5. Update last location update time to current time
     await redis.set(LOCATION_UPDATED_KEY, new Date().toISOString());
   } catch (error) {
     console.error('Error in resetAll:', error);
@@ -257,58 +263,50 @@ export async function resetAll(): Promise<void> {
   }
 }
 
-// User round play tracking functions
-function getUserRoundPlayKey(fid: number): string {
-  return `far-guesser:user-play:${fid}`;
-}
-
-// New function to get user's round play data
+// Function to get user's round play data
 export async function getUserRoundPlay(fid: number): Promise<any> {
   // Get the current location index
   const currentLocationIndex = await redis.get<number>(LOCATION_INDEX_KEY) || 0;
   
-  // Get the location index when the user last played
-  const lastPlayedLocationIndex = await redis.get<number>(getUserRoundPlayKey(fid));
+  // Get user data
+  const userData = await redis.get<ConsolidatedUserData>(getUserDataKey(fid));
   
-  // If user hasn't played any round yet or played a different round
-  if (lastPlayedLocationIndex === null || lastPlayedLocationIndex === undefined || 
-      lastPlayedLocationIndex !== currentLocationIndex) {
-    return null;
+  // If user has data and has played the current round
+  if (userData && userData.lastRoundPlayed === currentLocationIndex && userData.guess) {
+    return userData.guess;
   }
   
-  // Get the user's guess data from the detailed guess storage
-  const userGuessKey = `far-guesser:user-guess:${fid}:${currentLocationIndex}`;
-  const userGuess = await redis.get(userGuessKey);
-  
-  return userGuess;
+  return null;
 }
 
 export async function recordUserPlay(fid: number, guessData?: any): Promise<void> {
   // Get the current location index
   const currentLocationIndex = await redis.get<number>(LOCATION_INDEX_KEY) || 0;
   
-  // Store the location index that the user played instead of timestamp
-  await redis.set(getUserRoundPlayKey(fid), currentLocationIndex);
+  // Update consolidated data
+  const userData = await redis.get<ConsolidatedUserData>(getUserDataKey(fid)) || {} as ConsolidatedUserData;
+  userData.lastRoundPlayed = currentLocationIndex;
   
-  // If guess data is provided, store it in a separate key for retrieval later
   if (guessData) {
-    const userGuessKey = `far-guesser:user-guess:${fid}:${currentLocationIndex}`;
-    await redis.set(userGuessKey, guessData);
+    // Make sure guessData has the right structure before assigning
+    if (typeof guessData === 'object' && guessData.position && typeof guessData.distance === 'number') {
+      userData.guess = {
+        position: guessData.position,
+        distance: guessData.distance
+      };
+    }
   }
+  
+  await redis.set(getUserDataKey(fid), userData);
 }
 
 export async function hasUserPlayedCurrentRound(fid: number): Promise<boolean> {
-  // Get the location index when the user last played
-  const lastPlayedLocationIndex = await redis.get<number>(getUserRoundPlayKey(fid));
-  
-  // If user hasn't played any round yet
-  if (lastPlayedLocationIndex === null || lastPlayedLocationIndex === undefined) return false;
-  
   // Get the current location index
   const currentLocationIndex = await redis.get<number>(LOCATION_INDEX_KEY) || 0;
   
-  // User has played the current round if the location indices match
-  return lastPlayedLocationIndex === currentLocationIndex;
+  // Check if user has played the current round
+  const userData = await redis.get<ConsolidatedUserData>(getUserDataKey(fid));
+  return !!(userData && userData.lastRoundPlayed === currentLocationIndex);
 }
 
 // Round timing functions

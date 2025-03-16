@@ -1,15 +1,20 @@
 # 🖼️ FarGuesser.
 
 FarGuesser
+- check happening 3 times
 - refactor fid code
-- consolidate guess, last play and notification
 - Add metadata to minting
 - Mixpanel
 
 maybe:
 - add click on map to show username
 - show collected nfts
+
+      payload: "eyJkb21haW4iOiJmZDljMmMyY2JlNzcubmdyb2suYXBwIn0",
+      signature: "MHgzNzVkZjJmNDI3MjRmNDI2NjMxMGFlOWVkMWMwZWQyMTZiMjFhYzBiMmIyYTNmZWM3NjhjZDEzZGY5N2Y3MGVjNWQwOWExYjk0NTM0NmJmNTBjYTA3N2NjZGRiMzQxNTUxNmM1MTAwN2M3ZDZjNGM5NDExYzMyY2YzY2ZjZTM4YTFi"
+      
 ## Getting Started
+
 
 This is a [NextJS](https://nextjs.org/) + TypeScript + React app.
 

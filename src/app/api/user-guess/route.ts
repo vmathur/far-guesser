@@ -1,14 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { authOptions } from '../../../auth';
 import { getUserRoundPlay } from '../../../lib/kv';
 
 export async function GET(request: NextRequest) {
   try {
     // Get FID from header
-    const userFid = request.headers.get('X-Farcaster-User-FID');
+    const userFidStr = request.headers.get('X-Farcaster-User-FID');
     
-    if (!userFid) {
+    if (!userFidStr) {
       return NextResponse.json({ success: false, error: 'Unauthorized - No FID available' }, { status: 401 });
+    }
+    
+    // Convert string FID to number
+    const userFid = parseInt(userFidStr, 10);
+    if (isNaN(userFid)) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Invalid FID format' 
+      }, { status: 400 });
     }
     
     // Get the user's previous guess for the current round

@@ -7,11 +7,23 @@ export async function GET(request: NextRequest) {
     console.log('Received check-play-status request');
     
     // Get FID from header
-    const userFid = request.headers.get('X-Farcaster-User-FID');
-        
-    if (!userFid) {
+    const userFidStr = request.headers.get('X-Farcaster-User-FID');
+    
+    if (!userFidStr) {
       console.log('No FID available from header');
-      return NextResponse.json({ success: false, error: 'Unauthorized - No FID available' }, { status: 401 });
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Unauthorized - No FID available' 
+      }, { status: 401 });
+    }
+    
+    // Convert string FID to number
+    const userFid = parseInt(userFidStr, 10);
+    if (isNaN(userFid)) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Invalid FID format' 
+      }, { status: 400 });
     }
     
     // Check if the user has played the current round
