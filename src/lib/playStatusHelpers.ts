@@ -2,7 +2,6 @@
  * Helper functions for checking player status
  */
 import { Guess } from '../components/types/LocationGuesserTypes';
-import { getUserName } from './analytics';
 
 /**
  * Checks if the user has played the current round and retrieves their guess if they have
@@ -36,7 +35,6 @@ export async function checkUserPlayStatus(fid: number | null): Promise<{
       headers
     });
     const data = await response.json();
-    console.log('data', data);
     
     // Extract timeUntilNextRound and userGuess from API response
     const { timeUntilNextRound, userGuess } = data;

@@ -29,6 +29,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   const [dailyLeaderboard, setDailyLeaderboard] = useState<any[]>([]);
   const analytics = useGameAnalytics();
   const [otherUsersGuesses, setOtherUsersGuesses] = useState<UserGuess[]>([]);
+  console.log("Component rendering"); // Will run on every render
 
   // Track results_viewed event when component mounts
   useEffect(() => {
@@ -49,6 +50,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
           headers.append('X-Farcaster-User-FID', fid.toString());
         }
         console.log('yo')
+        console.log('fid', fid);
         const response = await fetch('/api/leaderboard?type=daily&include_guesses=true', {
           headers
         });

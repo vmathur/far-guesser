@@ -26,8 +26,6 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
       // IMPORTANT: Also set the FID in the analytics module
       // This ensures getUserFid() will return the correct value
       setAnalyticsUserFid(fidString);
-      
-      console.log(`FID set in AnalyticsContext: ${fidString}`);
     }
   };
 
@@ -37,8 +35,6 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }
       
       // Also set the username in the analytics module
       setAnalyticsUserName(newUsername);
-      
-      console.log(`Username set in AnalyticsContext: ${newUsername}`);
     }
   };
 

@@ -73,9 +73,7 @@ export default function AutoAuthFrame() {
             // Also set the username if available
             if (context.user.username) {
               setUsername(context.user.username);
-              console.log('Farcaster username set:', context.user.username);
             } else {
-              console.log('Farcaster username not available');
             }
           }
           
