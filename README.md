@@ -2,9 +2,10 @@
 
 FarGuesser
 - refactor and get rid of code
-  - change how how notifications works
-  - optimize network calls
+- consolidate guess and last play
+- optimize network calls
 - Add metadata to minting
+- Mixpanel
 
 maybe:
 - add click on map to show username

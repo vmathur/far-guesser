@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { Guess, Location } from './types/LocationGuesserTypes';
 import { useGoogleMapsLoader, useGoogleMapsLoaded, calculateDistance } from './utils/GoogleMapsUtil';
 import sdk from '@farcaster/frame-sdk';
@@ -111,9 +111,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   // Handle Google Maps loading
   useEffect(() => {
     if (!googleMapsLoaded) {
-      console.log('Loading Google Maps in ResultsView');
       loadGoogleMapsAPI(() => {
-        console.log('Google Maps loaded callback in ResultsView');
       }, 'ResultsView');
     }
   }, [googleMapsLoaded, loadGoogleMapsAPI]);
@@ -132,7 +130,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({
       try {
         if (sdk) {
           const context = await sdk.context;
-          console.log('ResultsView loaded SDK Context:', context);
           setSdkContext(context);
         }
       } catch (error) {
@@ -147,7 +144,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     if (guess?.distance) {
       analytics.resultsViewed({ distance: guess.distance });
     }
-  }, [guess, analytics]);
+  }, [guess]);
   
   // Fetch other users' guesses when SDK context is loaded and process leaderboard data
   useEffect(() => {
@@ -162,9 +159,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
         if (sdkContext.user?.fid) {
           headers.append('X-Farcaster-User-FID', sdkContext.user.fid.toString());
         }
-        
-        console.log("Fetching leaderboard data and other users' guesses...");
-        
+                
         const response = await fetch('/api/leaderboard?type=daily&include_guesses=true', {
           headers
         });
@@ -199,13 +194,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({
               
               const hasValidPosition = entry.position && entry.position.lat && entry.position.lng;
               
-              console.log(`Entry ${entry.name}:`, 
-                `isCurrentUser=${isCurrentUser}`, 
-                `hasPosition=${!!entry.position}`, 
-                `hasValidPosition=${hasValidPosition}`,
-                `pfpUrl=${entry.pfpUrl || 'none'}`
-              );
-              
               return !isCurrentUser && hasValidPosition;
             })
             .map((entry: any) => ({
@@ -220,7 +208,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({
               distance: entry.distance
             }));
           
-          console.log(`Found ${otherGuesses.length} other users' guesses:`, otherGuesses);
           setOtherUsersGuesses(otherGuesses);
         } else {
           console.warn("API response missing success or leaderboard data", data);
@@ -249,9 +236,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     
     // Set flag to indicate we've attempted initialization
     initializationAttemptedRef.current = true;
-    
-    console.log(`Initializing results map (attempt ${mapsInitAttempts + 1})`);
-    
+        
     try {
       // Type assertion for Google Maps
       const maps = window.google.maps as any;
@@ -326,17 +311,14 @@ const ResultsView: React.FC<ResultsViewProps> = ({
         
         // Signal that the map is ready for markers
         setMapReady(true);
-        console.log('Map initialized and ready for markers');
       });
       
-      console.log('Map initialized successfully');
       setLoading(false);
     } catch (error) {
       console.error("Error initializing results map:", error);
       
       // Retry after delay with exponential backoff
       const retryDelay = Math.pow(2, mapsInitAttempts) * 500;
-      console.log(`Will retry map initialization in ${retryDelay}ms`);
       
       setTimeout(() => {
         setMapsInitAttempts(prev => prev + 1);
@@ -354,7 +336,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({
       return;
     }
 
-    console.log('Adding markers to map');
     const map = googleMapRef.current;
     const maps = window.google.maps as any;
 
@@ -376,9 +357,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({
       title: "Your guess"
     });
     
-    // Actual location marker (green) - using a standard Google Maps marker
-    console.log("Creating actual location marker at:", actualLocation.position);
-    
     // Create the actual location marker using the default Google Maps pin
     const actualLocationMarker = new maps.Marker({
       position: actualLocation.position,
@@ -399,7 +377,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     
     // Add click listener to show info window
     maps.event.addListener(actualLocationMarker, 'click', function() {
-      console.log("Actual location marker clicked");
       actualLocationInfoWindow.open(map, actualLocationMarker);
     });
     
@@ -437,7 +414,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({
       return;
     }
     
-    console.log('Adding other player markers to map');
     const map = googleMapRef.current;
     const maps = window.google.maps as any;
     
@@ -566,7 +542,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({
                     infoWindow.open(map, pfpMarker);
                   });
                   
-                  console.log("Successfully created circular profile picture marker for:", userGuess.name);
                 } catch (canvasError) {
                   console.warn("Canvas operation failed:", canvasError);
                   // Fallback to the original approach
@@ -659,14 +634,11 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   }, [sendTransaction]);
 
   // Render the leaderboard section
-  const renderLeaderboardPreview = () => {
+  const renderLeaderboardPreview = useMemo(() => {
     if (leaderboardLoading) {
       return <div className="leaderboard-loading">Loading leaderboard...</div>;
     }
-    
-    // Debug leaderboard data to check pfpUrl
-    console.log("Rendering leaderboard with data:", dailyLeaderboard);
-    
+        
     return (
       <div className="leaderboard-preview" style={{ 
         marginTop: '30px', 
@@ -675,15 +647,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({
         borderRadius: '8px',
         fontFamily: selectedFont
       }}>
-        {/* <h3 style={{
-          textAlign: 'left',
-          borderBottom: '2px solid #ddd',
-          paddingBottom: '10px',
-          marginTop: '0'
-        }}>
-          Daily Leaderboard
-        </h3>
-         */}
         {dailyLeaderboard.length > 0 ? (
           <>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -731,7 +694,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({
                                 src={entry.pfpUrl} 
                                 alt={entry.name}
                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                onLoad={() => console.log(`${entry.name}'s profile image loaded successfully`)}
                                 onError={(e) => {
                                   console.warn(`Failed to load profile image for ${entry.name}:`, entry.pfpUrl);
                                   // Replace with initial if image fails to load
@@ -780,7 +742,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
         </div>
       </div>
     );
-  };
+  }, [leaderboardLoading, dailyLeaderboard, sdkContext?.user?.fid, selectedFont, onNextLocation]);
 
   // Add a countdown timer effect
   useEffect(() => {
@@ -946,7 +908,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
         ></div>
       </div>
       {/* Add leaderboard preview at the end */}
-      {renderLeaderboardPreview()}
+      {renderLeaderboardPreview}
     </div>
   );
 };

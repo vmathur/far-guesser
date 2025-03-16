@@ -62,7 +62,6 @@ export async function checkUserPlayStatus(sdkContext: any): Promise<{
     const guessData = await userGuessResponse.json();
     
     if (guessData.guess) {
-      console.log('Found previous guess');
       return { 
         hasPlayed: true, 
         userGuess: guessData.guess,

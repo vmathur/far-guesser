@@ -61,7 +61,6 @@ export const useGoogleMapsLoader = (setLoading: (loading: boolean) => void) => {
     
     // Check if the API is already loaded
     if (window.google && window.google.maps) {
-      console.log("Google Maps API already loaded, initializing", callerName);
       isGoogleMapsLoaded = true;
       callback();
       return;
@@ -72,7 +71,6 @@ export const useGoogleMapsLoader = (setLoading: (loading: boolean) => void) => {
     
     // If already loading, don't start another load
     if (isGoogleMapsLoading) {
-      console.log("Google Maps API is already being loaded, waiting for it...");
       return;
     }
     
@@ -85,7 +83,6 @@ export const useGoogleMapsLoader = (setLoading: (loading: boolean) => void) => {
     
     // Use direct indexing with any
     window[callbackName] = () => {
-      console.log("Google Maps API loaded via script");
       isGoogleMapsLoading = false;
       isGoogleMapsLoaded = true;
       
