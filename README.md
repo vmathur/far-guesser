@@ -1,7 +1,6 @@
-# 🖼️ FarGuesser.
+# 🖼️ FarGuesser
 
 FarGuesser
-- check happening 3 times
 - refactor fid code
 - Add metadata to minting
 - Mixpanel

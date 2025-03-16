@@ -10,12 +10,6 @@ interface RulesScreenProps {
   onPlay: () => void;
 }
 
-interface PlayStatus {
-  hasPlayed: boolean;
-  timeUntilNextRound: number;
-  formattedTimeUntilNextRound: string;
-}
-
 // Define a type for the SDK context
 type FrameSDKContext = {
   user?: {
@@ -33,10 +27,7 @@ type FrameSDKContext = {
 }
 
 const RulesScreen: FC<RulesScreenProps> = ({ onPlay }) => {
-  const [playStatus, setPlayStatus] = useState<PlayStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [countdown, setCountdown] = useState<string>('');
-  // Remove debug message state
   // Track SDK context
   const [sdkContext, setSdkContext] = useState<FrameSDKContext | null>(null);
   const analytics = useGameAnalytics();
@@ -51,11 +42,14 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay }) => {
           // Access sdk.context directly as a promise
           const context = await sdk.context;
           setSdkContext(context);
+          setIsLoading(false);
         } else {
           console.log('RulesScreen: SDK is not available yet');
+          setIsLoading(false);
         }
       } catch (error) {
         console.error('RulesScreen: Error in loadSdkContext:', error);
+        setIsLoading(false);
       }
     };
     
@@ -63,87 +57,6 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay }) => {
   }, []);
   // Get FID from SDK context
   const userFid = sdkContext?.user?.fid
-  
-  // Fetch the play status only after we have a user FID
-  useEffect(() => {
-    const fetchPlayStatus = async () => {
-      // Only proceed if we have a user FID
-      if (!userFid) {
-        return;
-      }
-      
-      try {
-        const response = await fetch('/api/check-play-status', {
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Farcaster-User-FID': userFid.toString()
-          },
-          cache: 'no-store',
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-          setPlayStatus({
-            hasPlayed: data.hasPlayed,
-            timeUntilNextRound: data.timeUntilNextRound,
-            formattedTimeUntilNextRound: data.formattedTimeUntilNextRound
-          });
-          setCountdown(data.formattedTimeUntilNextRound);
-        }
-      } catch (error) {
-        console.error('Error fetching play status:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    if (!isLoading || userFid) {
-      fetchPlayStatus();
-    }
-  }, [userFid, isLoading]);
-  
-  // Update the countdown timer
-  useEffect(() => {
-    if (!playStatus?.hasPlayed) return;
-    
-    const timer = setInterval(() => {
-      if (playStatus.timeUntilNextRound <= 0) {
-        setCountdown('Almost ready...');
-        clearInterval(timer);
-        return;
-      }
-      
-      const newTimeRemaining = playStatus.timeUntilNextRound - 1000;
-      
-      if (newTimeRemaining <= 0) {
-        setCountdown('Almost ready...');
-        clearInterval(timer);
-        // Reload the page to get a fresh status
-        window.location.reload();
-        return;
-      }
-      
-      // Update the formatted time
-      const seconds = Math.floor(newTimeRemaining / 1000) % 60;
-      const minutes = Math.floor(newTimeRemaining / (1000 * 60)) % 60;
-      const hours = Math.floor(newTimeRemaining / (1000 * 60 * 60));
-      
-      const formattedHours = String(hours).padStart(2, '0');
-      const formattedMinutes = String(minutes).padStart(2, '0');
-      const formattedSeconds = String(seconds).padStart(2, '0');
-      
-      setCountdown(`${formattedHours}:${formattedMinutes}:${formattedSeconds}`);
-      
-      // Update the remaining time
-      setPlayStatus(prev => {
-        if (!prev) return prev;
-        return { ...prev, timeUntilNextRound: newTimeRemaining };
-      });
-    }, 1000);
-    
-    return () => clearInterval(timer);
-  }, [playStatus]);
 
   const styles: Record<string, CSSProperties> = {
     container: {
@@ -209,13 +122,13 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay }) => {
       lineHeight: '1.5',
     },
     playButton: {
-      backgroundColor: playStatus?.hasPlayed ? '#cccccc' : '#4CAF50',
+      backgroundColor: '#4CAF50',
       color: 'white',
       padding: '15px 35px',
       fontSize: '1.4em',
       border: 'none',
       borderRadius: '8px',
-      cursor: playStatus?.hasPlayed ? 'not-allowed' : 'pointer',
+      cursor: 'pointer',
       fontWeight: 'bold',
       transition: 'all 0.3s',
       fontFamily: `"Patrick Hand", "Comic Sans MS", cursive`,
@@ -231,13 +144,6 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay }) => {
       marginTop: '10px',
       fontSize: '0.9em',
       color: '#666',
-    },
-    countdown: {
-      marginTop: '12px',
-      fontSize: '1.2em',
-      color: '#666',
-      fontFamily: `"Patrick Hand", "Comic Sans MS", cursive`,
-      whiteSpace: 'nowrap',
     },
     loadingIndicator: {
       marginTop: '20px',
@@ -318,7 +224,7 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay }) => {
         ) : (
           <>
             <motion.button
-                onClick={playStatus?.hasPlayed ? undefined : handlePlayClick}
+                onClick={handlePlayClick}
                 className="bg-green-500 text-white font-bold py-3 px-8 rounded-lg text-lg select-none touch-none"
                 initial={{ 
                   boxShadow: "0px 5px 0px  rgba(0, 0, 0, 0.5), 0px 5px 10px rgba(0, 0, 0, 0.5)" 
@@ -331,12 +237,6 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay }) => {
               >
                 Play
             </motion.button>
-            
-            {playStatus?.hasPlayed && (
-              <div style={styles.countdown}>
-                <p>Next round: {countdown}</p>
-              </div>
-            )}
           </>
         )}
         
