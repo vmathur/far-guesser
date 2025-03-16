@@ -24,7 +24,6 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
   const [userGuess, setUserGuess] = useState<any>(null);
   const [sdkContext, setSdkContext] = useState<any>(null);
   const [timeUntilNextRound, setTimeUntilNextRound] = useState<number | undefined>(undefined);
-  const selectedFont = 'Patrick Hand';
   const analytics = useGameAnalytics();
   
   const styles: Record<string, CSSProperties> = {
@@ -42,7 +41,7 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
       alignItems: 'center',
       minHeight: '300px',
       fontSize: '1.2rem',
-      fontFamily: selectedFont,
+      fontFamily: 'Patrick Hand',
     }
   };
 
@@ -121,11 +120,10 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
       case 'loading':
         return <div style={styles.loading}>Loading...</div>;
       case 'rules':
-        return <RulesScreen onPlay={handlePlay} selectedFont={selectedFont} />;
+        return <RulesScreen onPlay={handlePlay} />;
       case 'playing':
         return (
           <LocationGuesserView 
-            selectedFont={selectedFont} 
             dailyLocation={dailyLocation} 
             onGameComplete={handleGameComplete}
             initialGameState="viewing"
@@ -134,7 +132,6 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
       case 'results':
         return (
           <LocationGuesserView 
-            selectedFont={selectedFont} 
             dailyLocation={dailyLocation}
             initialGameState="results"
             initialGuess={userGuess}

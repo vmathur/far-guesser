@@ -13,7 +13,6 @@ import sdk from '@farcaster/frame-sdk';
 import { submitUserGuess } from '../lib/playStatusHelpers';
 
 interface LocationGuesserViewProps {
-  selectedFont: string;
   dailyLocation: Location;
   initialGameState?: GameState;
   initialGuess?: Guess | null;
@@ -22,7 +21,6 @@ interface LocationGuesserViewProps {
 }
 
 const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({ 
-  selectedFont, 
   dailyLocation, 
   initialGameState = 'viewing',
   initialGuess = null,
@@ -165,13 +163,12 @@ const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({
             guess={guess}
             actualLocation={dailyLocation}
             onNextLocation={handleNextLocation}
-            selectedFont={selectedFont}
             errorMessage={errorMessage}
             timeUntilNextRound={timeUntilNextRound}
           />
         ) : null;
       case 'leaderboard':
-        return <LeaderboardView onNextLocation={handleNextLocation} selectedFont={selectedFont} />;
+        return <LeaderboardView onNextLocation={handleNextLocation} />;
       default:
         return null;
     }

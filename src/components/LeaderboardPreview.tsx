@@ -9,7 +9,6 @@ interface LeaderboardPreviewProps {
   dailyLeaderboard: LeaderboardEntry[];
   leaderboardLoading: boolean;
   sdkContext: FrameSDKContext | null;
-  selectedFont?: string;
   onNextLocation: () => void;
 }
 
@@ -17,7 +16,6 @@ const LeaderboardPreview: React.FC<LeaderboardPreviewProps> = ({
   dailyLeaderboard,
   leaderboardLoading,
   sdkContext,
-  selectedFont = 'Chalkboard SE',
   onNextLocation
 }) => {
   if (leaderboardLoading) {
@@ -30,7 +28,7 @@ const LeaderboardPreview: React.FC<LeaderboardPreviewProps> = ({
       padding: '15px',
       backgroundColor: '#f5f5f5',
       borderRadius: '8px',
-      fontFamily: selectedFont
+      fontFamily: 'Patrick Hand'
     }}>
       {dailyLeaderboard.length > 0 ? (
         <>

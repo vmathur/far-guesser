@@ -7,12 +7,10 @@ import { getUserFid } from '../lib/analytics';
 
 interface LeaderboardViewProps {
   onNextLocation?: () => void;
-  selectedFont?: string;
 }
 
 const LeaderboardView: React.FC<LeaderboardViewProps> = ({ 
-  onNextLocation, 
-  selectedFont = 'Chalkboard SE' 
+  onNextLocation
 }) => {
   const [allTimeLeaderboard, setAllTimeLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -133,7 +131,7 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       padding: '20px',
       maxWidth: '600px',
       margin: '0 auto',
-      fontFamily: `"${selectedFont}", "Comic Sans MS", cursive`
+      fontFamily: `"Patrick Hand", "Comic Sans MS", cursive`
     }}>
       {/* Back Button */}
       <button
@@ -145,7 +143,7 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({
           border: 'none',
           borderRadius: '4px',
           cursor: 'pointer',
-          fontFamily: `"${selectedFont}", "Comic Sans MS", cursive`,
+          fontFamily: `"Patrick Hand", "Comic Sans MS", cursive`,
           display: 'flex',
           alignItems: 'center',
           gap: '5px',

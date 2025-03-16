@@ -8,7 +8,6 @@ import { motion } from 'framer-motion';
 
 interface RulesScreenProps {
   onPlay: () => void;
-  selectedFont: string;
 }
 
 interface PlayStatus {
@@ -33,7 +32,7 @@ type FrameSDKContext = {
   };
 }
 
-const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
+const RulesScreen: FC<RulesScreenProps> = ({ onPlay }) => {
   const [playStatus, setPlayStatus] = useState<PlayStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [countdown, setCountdown] = useState<string>('');
@@ -188,7 +187,7 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
       fontSize: '3.2em',
       color: '#333',
       marginBottom: '25px',
-      fontFamily: `"${selectedFont}", "Comic Sans MS", cursive`,
+      fontFamily: `"Patrick Hand", "Comic Sans MS", cursive`,
       textShadow: '2px 2px 4px rgba(0,0,0,0.1)',
     },
     rulesContainer: {
@@ -203,7 +202,7 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
       padding: '15px 15px 15px 15px',
       margin: '10px 0',
       borderRadius: '10px',
-      fontFamily: `"${selectedFont}", "Comic Sans MS", cursive`,
+      fontFamily: `"Patrick Hand", "Comic Sans MS", cursive`,
       fontSize: '1.4em',
       color: '#444',
       marginBottom: '10px',
@@ -219,7 +218,7 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
       cursor: playStatus?.hasPlayed ? 'not-allowed' : 'pointer',
       fontWeight: 'bold',
       transition: 'all 0.3s',
-      fontFamily: `"${selectedFont}", "Comic Sans MS", cursive`,
+      fontFamily: `"Patrick Hand", "Comic Sans MS", cursive`,
       transform: 'scale(1)',
     },
     emoji: {
@@ -237,7 +236,7 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
       marginTop: '12px',
       fontSize: '1.2em',
       color: '#666',
-      fontFamily: `"${selectedFont}", "Comic Sans MS", cursive`,
+      fontFamily: `"Patrick Hand", "Comic Sans MS", cursive`,
       whiteSpace: 'nowrap',
     },
     loadingIndicator: {
@@ -254,7 +253,7 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
       borderRadius: '4px',
       cursor: 'pointer',
       marginTop: '10px',
-      fontFamily: `"${selectedFont}", "Comic Sans MS", cursive`,
+      fontFamily: `"Patrick Hand", "Comic Sans MS", cursive`,
     }
   };
 

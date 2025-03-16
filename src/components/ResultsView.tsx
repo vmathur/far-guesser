@@ -13,7 +13,6 @@ interface ResultsViewProps {
   guess: Guess;
   actualLocation: Location;
   onNextLocation: () => void;
-  selectedFont?: string;
   errorMessage?: string | null;
   timeUntilNextRound?: number;
 }
@@ -22,7 +21,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   guess, 
   actualLocation, 
   onNextLocation,
-  selectedFont = 'Chalkboard SE',
   errorMessage = null,
   timeUntilNextRound
 }) => {
@@ -132,7 +130,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
           borderRadius: '4px',
           marginBottom: '20px',
           border: '1px solid #ffcdd2',
-          fontFamily: `"${selectedFont}", "Comic Sans MS", cursive`
+          fontFamily: `"Patrick Hand", "Comic Sans MS", cursive`
         }}>
           {errorMessage}
         </div>
@@ -142,7 +140,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
         fontSize: '20px', 
         marginBottom: '20px', 
         color: '#000',
-        fontFamily: `"${selectedFont}", "Comic Sans MS", cursive`
+        fontFamily: `"Patrick Hand", "Comic Sans MS", cursive`
       }}>
         <p style={{ fontSize: '30px' }}><b>You were <strong>{guess.distance.toLocaleString()}</strong> km away</b></p>
       </div>
@@ -156,7 +154,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({
         actualLocation={actualLocation}
         otherUsersGuesses={otherUsersGuesses}
         timeUntilNextRound={timeUntilNextRound}
-        selectedFont={selectedFont}
       />
       
       {/* Leaderboard Preview */}
@@ -164,7 +161,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({
         dailyLeaderboard={dailyLeaderboard}
         leaderboardLoading={leaderboardLoading}
         sdkContext={sdkContext}
-        selectedFont={selectedFont}
         onNextLocation={onNextLocation}
       />
     </div>
