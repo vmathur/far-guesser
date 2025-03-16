@@ -164,4 +164,5 @@ export interface LeaderboardEntry {
   timestamp?: number;
   isCurrentUser?: boolean;
   fid?: string; // Farcaster ID
+  pfpUrl?: string; // Profile picture URL
 } 
