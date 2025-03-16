@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { hasUserPlayedCurrentRound, getTimeUntilNextRound } from '../../../lib/kv';
-import { authOptions } from '../../../auth';
+import { hasUserPlayedCurrentRound, getTimeUntilNextRound, getUserRoundPlay } from '../../../lib/kv';
 
 export async function GET(request: NextRequest) {
   try {
@@ -33,15 +32,18 @@ export async function GET(request: NextRequest) {
     // Get the time until the next round
     const timeUntilNextRound = await getTimeUntilNextRound();
     
-    // Format time for convenience
-    const formattedTime = formatTimeRemaining(timeUntilNextRound);
-    console.log('Formatted time until next round:', formattedTime);
+    // Get the user's guess if they have played
+    let userGuess = null;
+    if (hasPlayed) {
+      userGuess = await getUserRoundPlay(userFid);
+      console.log(`Retrieved user ${userFid}'s guess:`, userGuess);
+    }
     
     const response = {
       success: true,
       hasPlayed,
-      timeUntilNextRound,
-      formattedTimeUntilNextRound: formattedTime
+      userGuess,
+      timeUntilNextRound
     };
     
     return NextResponse.json(response);
@@ -53,20 +55,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-
-// Helper function to format time remaining
-function formatTimeRemaining(milliseconds: number): string {
-  if (milliseconds <= 0) {
-    return "Available now";
-  }
-  
-  const seconds = Math.floor(milliseconds / 1000) % 60;
-  const minutes = Math.floor(milliseconds / (1000 * 60)) % 60;
-  const hours = Math.floor(milliseconds / (1000 * 60 * 60));
-  
-  const formattedHours = String(hours).padStart(2, '0');
-  const formattedMinutes = String(minutes).padStart(2, '0');
-  const formattedSeconds = String(seconds).padStart(2, '0');
-  
-  return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
-} 

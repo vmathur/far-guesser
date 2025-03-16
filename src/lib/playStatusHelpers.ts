@@ -39,9 +39,10 @@ export async function checkUserPlayStatus(sdkContext: any): Promise<{
       headers
     });
     const data = await response.json();
+    console.log('data', data);
     
-    // Extract timeUntilNextRound from API response
-    const timeUntilNextRound = data.timeUntilNextRound;
+    // Extract timeUntilNextRound and userGuess from API response
+    const { timeUntilNextRound, userGuess } = data;
     
     if (!data.hasPlayed) {
       console.log(`User ${userFid} has not played today`);
@@ -53,30 +54,14 @@ export async function checkUserPlayStatus(sdkContext: any): Promise<{
       };
     }
     
-    console.log(`User ${userFid} has already played today, fetching previous guess`);
+    console.log(`User ${userFid} has already played today, guess data received:`, userGuess);
     
-    // User has already played today, fetch their previous guess
-    const userGuessResponse = await fetch('/api/user-guess', {
-      headers
-    });
-    const guessData = await userGuessResponse.json();
-    
-    if (guessData.guess) {
-      return { 
-        hasPlayed: true, 
-        userGuess: guessData.guess,
-        error: null,
-        timeUntilNextRound
-      };
-    } else {
-      console.log('No previous guess found despite hasPlayed=true');
-      return { 
-        hasPlayed: true, 
-        userGuess: null,
-        error: 'Could not retrieve previous guess',
-        timeUntilNextRound
-      };
-    }
+    return { 
+      hasPlayed: true, 
+      userGuess,
+      error: null,
+      timeUntilNextRound
+    };
   } catch (error) {
     console.error('Error checking play status:', error);
     return { 
