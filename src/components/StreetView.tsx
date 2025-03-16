@@ -108,6 +108,9 @@ const StreetView: React.FC<StreetViewProps> = ({
 
   return (
     <div>
+        <p style={{ marginBottom: '15px', color: '#555' }}>
+          Drag and click to explore
+        </p>
       <div 
         style={{ 
           height: '500px', 
