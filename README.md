@@ -1,7 +1,7 @@
 # 🖼️ FarGuesser
 
 FarGuesser
-- refactor fid code
+- Refactor fid code
 - Add metadata to minting
 - Mixpanel
 

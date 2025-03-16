@@ -13,14 +13,14 @@ export interface GameLocation {
 // Array of all game locations
 export const gameLocations: GameLocation[] = [
   { 
+    position: { lat: 33.987471, lng: -118.472732 }, 
+    answer: 'Venice', 
+    hint: 'Beach'
+  },
+  { 
     position: { lat: 1.283404, lng: 103.863134 }, 
     answer: 'Singapore', 
     hint: 'Marina Bay'
-  },
-  { 
-    position: { lat: 40.7580, lng: -73.9855 }, 
-    answer: 'New York', 
-    hint: 'Times Square'
   },
   { 
     position: { lat: 48.858093, lng: 2.294694 }, 
@@ -31,11 +31,6 @@ export const gameLocations: GameLocation[] = [
     position: { lat: 51.510020, lng: -0.134730 }, 
     answer: 'London', 
     hint: 'Near Hyde Park'
-  },
-  { 
-    position: { lat: 37.809307, lng: -122.475891 }, 
-    answer: 'San Francisco', 
-    hint: 'Golden Gate Bridge' 
   },
   { 
     position: { lat: 35.6595, lng: 139.7004 }, 
@@ -71,6 +66,11 @@ export const gameLocations: GameLocation[] = [
     position: { lat: 55.7558, lng: 37.6173 }, 
     answer: 'Moscow', 
     hint: 'Red Square' 
+  },
+  { 
+    position: { lat: 6.509123, lng: 3.366910 }, 
+    answer: 'Lagos', 
+    hint: 'Nigeria, Africa' 
   },
   { 
     position: { lat: -22.9068, lng: -43.1729 }, 
