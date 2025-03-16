@@ -1,62 +1,26 @@
 import { useEffect, useState, FC } from 'react';
 import { CSSProperties } from 'react';
-import { signIn } from 'next-auth/react';
-import sdk from '@farcaster/frame-sdk';
 import { useGameAnalytics } from '~/lib/analytics';
 import { gameConfig } from '~/data/gameConfig';
 import { motion } from 'framer-motion';
 
 interface RulesScreenProps {
   onPlay: () => void;
+  fid: number | null;
 }
 
-// Define a type for the SDK context
-type FrameSDKContext = {
-  user?: {
-    fid?: number;
-    username?: string;
-    displayName?: string;
-  };
-  frames?: {
-    frameUrl?: string;
-    castId?: {
-      fid?: number;
-      hash?: string;
-    };
-  };
-}
-
-const RulesScreen: FC<RulesScreenProps> = ({ onPlay }) => {
+const RulesScreen: FC<RulesScreenProps> = ({ onPlay, fid }) => {
   const [isLoading, setIsLoading] = useState(true);
-  // Track SDK context
-  const [sdkContext, setSdkContext] = useState<FrameSDKContext | null>(null);
   const analytics = useGameAnalytics();
   
-  // Load SDK context directly
+  // Set loading to false after a short delay
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
     
-    const loadSdkContext = async () => {
-      try {
-        if (typeof sdk !== 'undefined' && sdk) {
-          
-          // Access sdk.context directly as a promise
-          const context = await sdk.context;
-          setSdkContext(context);
-          setIsLoading(false);
-        } else {
-          console.log('RulesScreen: SDK is not available yet');
-          setIsLoading(false);
-        }
-      } catch (error) {
-        console.error('RulesScreen: Error in loadSdkContext:', error);
-        setIsLoading(false);
-      }
-    };
-    
-    loadSdkContext();
+    return () => clearTimeout(timer);
   }, []);
-  // Get FID from SDK context
-  const userFid = sdkContext?.user?.fid
 
   const styles: Record<string, CSSProperties> = {
     container: {
@@ -176,24 +140,6 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay }) => {
     };
   }, []);
 
-  const handleSignIn = async () => {
-    try {
-      const nonce = await fetch('/api/auth/csrf').then(res => res.json()).then(data => data.csrfToken);
-      
-      // Trigger Farcaster sign-in
-      const result = await sdk.actions.signIn({ nonce });
-      
-      // Send the signed message to our auth backend
-      await signIn("credentials", {
-        message: result.message,
-        signature: result.signature,
-        redirect: false,
-      });
-    } catch (error) {
-      console.error("Sign-in error:", error);
-    }
-  };
-
   const handlePlayClick = () => {
     // Track the game_started event
     analytics.gameStarted();
@@ -238,17 +184,6 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay }) => {
                 Play
             </motion.button>
           </>
-        )}
-        
-        {!userFid && (
-          <div style={{ marginTop: '20px' }}>
-            <button
-              onClick={handleSignIn}
-              style={styles.signInButton}
-            >
-              Connect to Farcaster
-            </button>
-          </div>
         )}
       </div>
     </div>

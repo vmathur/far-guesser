@@ -2,20 +2,19 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FrameSDKContext } from './types/UserGuess';
 import { LeaderboardEntry } from './types/LocationGuesserTypes';
 
 interface LeaderboardPreviewProps {
   dailyLeaderboard: LeaderboardEntry[];
   leaderboardLoading: boolean;
-  sdkContext: FrameSDKContext | null;
+  fid: number | null;
   onNextLocation: () => void;
 }
 
 const LeaderboardPreview: React.FC<LeaderboardPreviewProps> = ({
   dailyLeaderboard,
   leaderboardLoading,
-  sdkContext,
+  fid,
   onNextLocation
 }) => {
   if (leaderboardLoading) {
@@ -45,9 +44,9 @@ const LeaderboardPreview: React.FC<LeaderboardPreviewProps> = ({
               {dailyLeaderboard.map((entry, index) => (
                 <tr key={index} style={{ 
                   borderBottom: '1px solid #ddd',
-                  backgroundColor: sdkContext?.user?.fid && 
+                  backgroundColor: fid && 
                     entry.fid && 
-                    entry.fid.toString() === sdkContext.user.fid.toString() 
+                    entry.fid.toString() === fid.toString() 
                     ? '#fffde7' 
                     : 'transparent'
                 }}>
@@ -86,9 +85,9 @@ const LeaderboardPreview: React.FC<LeaderboardPreviewProps> = ({
                           entry.name.slice(0, 1).toUpperCase()
                         )}
                       </div>
-                      <div style={{ fontWeight: sdkContext?.user?.fid && 
+                      <div style={{ fontWeight: fid && 
                           entry.fid && 
-                          entry.fid.toString() === sdkContext.user.fid.toString() ? 'bold' : 'normal' }}>
+                          entry.fid.toString() === fid.toString() ? 'bold' : 'normal' }}>
                         {entry.name}
                       </div>
                     </div>

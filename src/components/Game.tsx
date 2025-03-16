@@ -22,8 +22,11 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
   // New game flow states
   const [gameFlow, setGameFlow] = useState<'loading' | 'rules' | 'playing' | 'results'>('loading');
   const [userGuess, setUserGuess] = useState<any>(null);
-  const [sdkContext, setSdkContext] = useState<any>(null);
   const [timeUntilNextRound, setTimeUntilNextRound] = useState<number | undefined>(undefined);
+  // New state variables for user information
+  const [fid, setFid] = useState<number | null>(null);
+  const [pfpUrl, setPfpUrl] = useState<string | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
   const analytics = useGameAnalytics();
   
   const styles: Record<string, CSSProperties> = {
@@ -50,14 +53,25 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
     analytics.pageView();
   }, [analytics]);
 
-  // Load Farcaster SDK context
+  // Load Farcaster SDK context and extract user information
   useEffect(() => {
     const loadSdkContext = async () => {
       try {
         if (sdk) {
           const context = await sdk.context;
           console.log('Game component loaded SDK Context:', context);
-          setSdkContext(context);
+          
+          // Extract and save user information
+          if (context?.user) {
+            setFid(context.user.fid || null);
+            setPfpUrl(context.user.pfpUrl || null);
+            setUsername(context.user.username || null);
+            console.log('User info extracted:', {
+              fid: context.user.fid,
+              pfpUrl: context.user.pfpUrl,
+              username: context.user.username
+            });
+          }
         }
       } catch (error) {
         console.error('Error loading SDK context:', error);
@@ -70,13 +84,8 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
   // Check if user has already played today's game
   useEffect(() => {
     const checkPlayStatus = async () => {
-      if (!sdkContext) {
-        setGameFlow('rules');
-        return;
-      }
-      
-      // Use the helper function to check play status
-      const playStatus = await checkUserPlayStatus(sdkContext);
+      // Use the helper function to check play status with fid directly
+      const playStatus = await checkUserPlayStatus(fid);
       
       if (playStatus.error) {
         console.error('Error checking play status:', playStatus.error);
@@ -99,11 +108,11 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
       }
     };
 
-    // Only run the check when the SDK context is loaded
-    if (sdkContext) {
+    // Only run the check when the fid is loaded
+    if (fid) {
       checkPlayStatus();
     }
-  }, [sdkContext]);
+  }, [fid]);
 
   const handlePlay = () => {
     setGameFlow('playing');
@@ -120,13 +129,16 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
       case 'loading':
         return <div style={styles.loading}>Loading...</div>;
       case 'rules':
-        return <RulesScreen onPlay={handlePlay} />;
+        return <RulesScreen onPlay={handlePlay} fid={fid} />;
       case 'playing':
         return (
           <LocationGuesserView 
             dailyLocation={dailyLocation} 
             onGameComplete={handleGameComplete}
             initialGameState="viewing"
+            fid={fid}
+            username={username}
+            pfpUrl={pfpUrl}
           />
         );
       case 'results':
@@ -136,6 +148,9 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
             initialGameState="results"
             initialGuess={userGuess}
             timeUntilNextRound={timeUntilNextRound}
+            fid={fid}
+            username={username}
+            pfpUrl={pfpUrl}
           />
         );
       default:

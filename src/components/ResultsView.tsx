@@ -2,9 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { Guess, Location } from './types/LocationGuesserTypes';
-import sdk from '@farcaster/frame-sdk';
 import { useGameAnalytics } from '../lib/analytics';
-import { UserGuess, FrameSDKContext } from './types/UserGuess';
+import { UserGuess } from './types/UserGuess';
 import ResultsMap from './ResultsMap';
 import LeaderboardPreview from './LeaderboardPreview';
 import ActionButtons from './ActionButtons';
@@ -15,6 +14,7 @@ interface ResultsViewProps {
   onNextLocation: () => void;
   errorMessage?: string | null;
   timeUntilNextRound?: number;
+  fid?: number | null;
 }
 
 const ResultsView: React.FC<ResultsViewProps> = ({ 
@@ -22,28 +22,13 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   actualLocation, 
   onNextLocation,
   errorMessage = null,
-  timeUntilNextRound
+  timeUntilNextRound,
+  fid = null
 }) => {
-  const [sdkContext, setSdkContext] = useState<FrameSDKContext | null>(null);
   const [leaderboardLoading, setLeaderboardLoading] = useState(true);
   const [dailyLeaderboard, setDailyLeaderboard] = useState<any[]>([]);
   const analytics = useGameAnalytics();
   const [otherUsersGuesses, setOtherUsersGuesses] = useState<UserGuess[]>([]);
-  // Load SDK context
-  useEffect(() => {
-    const loadSdkContext = async () => {
-      try {
-        if (sdk) {
-          const context = await sdk.context;
-          setSdkContext(context);
-        }
-      } catch (error) {
-        console.error('Error loading SDK context:', error);
-      }
-    };
-    
-    loadSdkContext();
-  }, []);
 
   // Track results_viewed event when component mounts
   useEffect(() => {
@@ -52,20 +37,18 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     }
   }, [guess, analytics]);
   
-  // Fetch other users' guesses when SDK context is loaded and process leaderboard data
+  // Fetch other users' guesses when fid is loaded and process leaderboard data
   useEffect(() => {
     const fetchOtherUsersGuesses = async () => {
-      if (!sdkContext) return;
-      
       try {
         setLeaderboardLoading(true);
         
         // Add FID to headers if available
         const headers = new Headers();
-        if (sdkContext.user?.fid) {
-          headers.append('X-Farcaster-User-FID', sdkContext.user.fid.toString());
+        if (fid) {
+          headers.append('X-Farcaster-User-FID', fid.toString());
         }
-                
+        console.log('yo')
         const response = await fetch('/api/leaderboard?type=daily&include_guesses=true', {
           headers
         });
@@ -80,9 +63,9 @@ const ResultsView: React.FC<ResultsViewProps> = ({
           // Filter out the current user's guess and entries without position data for map markers
           const otherGuesses = data.leaderboard
             .filter((entry: any) => {
-              const isCurrentUser = sdkContext.user?.fid && 
+              const isCurrentUser = fid && 
                 entry.fid && 
-                entry.fid.toString() === sdkContext.user.fid.toString();
+                entry.fid.toString() === fid.toString();
               
               const hasValidPosition = entry.position && entry.position.lat && entry.position.lng;
               
@@ -113,7 +96,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     };
     
     fetchOtherUsersGuesses();
-  }, [sdkContext]);
+  }, [fid]);
 
   return (
     <div style={{ 
@@ -160,7 +143,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
       <LeaderboardPreview
         dailyLeaderboard={dailyLeaderboard}
         leaderboardLoading={leaderboardLoading}
-        sdkContext={sdkContext}
+        fid={fid}
         onNextLocation={onNextLocation}
       />
     </div>

@@ -1,7 +1,7 @@
 # 🖼️ FarGuesser
 
 FarGuesser
-- Refactor fid code
+- Remove record-play?
 - Add metadata to minting
 - Mixpanel
 

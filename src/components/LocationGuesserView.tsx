@@ -9,7 +9,6 @@ import ResultsView from './ResultsView';
 import LeaderboardView from './LeaderboardView';
 import { gameConfig } from '../data/gameConfig';
 import { useGameAnalytics } from '../lib/analytics';
-import sdk from '@farcaster/frame-sdk';
 import { submitUserGuess } from '../lib/playStatusHelpers';
 
 interface LocationGuesserViewProps {
@@ -18,6 +17,9 @@ interface LocationGuesserViewProps {
   initialGuess?: Guess | null;
   onGameComplete?: (guess: Guess) => void;
   timeUntilNextRound?: number;
+  fid?: number | null;
+  username?: string | null;
+  pfpUrl?: string | null;
 }
 
 const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({ 
@@ -25,31 +27,17 @@ const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({
   initialGameState = 'viewing',
   initialGuess = null,
   onGameComplete,
-  timeUntilNextRound
+  timeUntilNextRound,
+  fid = null,
+  username = null,
+  pfpUrl = null
 }) => {
   const [timeLeft, setTimeLeft] = useState(gameConfig.VIEWING_TIME_MS); // Use the configured time
   const [gameState, setGameState] = useState<GameState>(initialGameState);
   const [guess, setGuess] = useState<Guess | null>(initialGuess);
   const [mapLoaded, setMapLoaded] = useState(false); // Add this state
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [sdkContext, setSdkContext] = useState<any>(null);
   const analytics = useGameAnalytics();
-  
-  // Load Farcaster SDK context
-  useEffect(() => {
-    const loadSdkContext = async () => {
-      try {
-        if (sdk) {
-          const context = await sdk.context;
-          setSdkContext(context);
-        }
-      } catch (error) {
-        console.error('Error loading SDK context:', error);
-      }
-    };
-    
-    loadSdkContext();
-  }, []);
 
   // Timer effect - updates the timer in viewing state
   useEffect(() => {
@@ -106,14 +94,14 @@ const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({
     analytics.guessSubmitted({ distance });
     
     // Use the helper function to submit the guess
-    if (sdkContext) {
-      const result = await submitUserGuess(sdkContext, guessWithDistance);
+    if (fid) {
+      const result = await submitUserGuess(fid, username, pfpUrl, guessWithDistance);
       
       if (!result.success) {
         setErrorMessage(result.error);
       }
     } else {
-      // Handle case where SDK context is not available
+      // Handle case where user is not authenticated
       setErrorMessage("Unable to submit score - authentication required");
     }
     
@@ -124,7 +112,7 @@ const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({
     if (onGameComplete) {
       onGameComplete(guessWithDistance);
     }
-  }, [dailyLocation, analytics, sdkContext, onGameComplete]);
+  }, [dailyLocation, analytics, fid, username, pfpUrl, onGameComplete]);
 
   // Handle going to next location or leaderboard
   const handleNextLocation = () => {
@@ -165,6 +153,7 @@ const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({
             onNextLocation={handleNextLocation}
             errorMessage={errorMessage}
             timeUntilNextRound={timeUntilNextRound}
+            fid={fid}
           />
         ) : null;
       case 'leaderboard':

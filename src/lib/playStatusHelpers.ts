@@ -6,21 +6,18 @@ import { getUserName } from './analytics';
 
 /**
  * Checks if the user has played the current round and retrieves their guess if they have
- * @param sdkContext - The Farcaster SDK context containing user information
+ * @param fid - The Farcaster user ID
  * @returns An object with hasPlayed status and the user's guess if available
  */
-export async function checkUserPlayStatus(sdkContext: any): Promise<{
+export async function checkUserPlayStatus(fid: number | null): Promise<{
   hasPlayed: boolean;
   userGuess: any | null;
   error: string | null;
   timeUntilNextRound?: number;
 }> {
   try {
-    // Get FID from SDK context
-    const userFid = sdkContext?.user?.fid;
-    
-    if (!userFid) {
-      console.log('No FID available from SDK context');
+    if (!fid) {
+      console.log('No FID provided');
       return { 
         hasPlayed: false, 
         userGuess: null,
@@ -28,11 +25,11 @@ export async function checkUserPlayStatus(sdkContext: any): Promise<{
       };
     }
 
-    console.log(`Checking if user ${userFid} has played using SDK context`);
+    console.log(`Checking if user ${fid} has played`);
     
     // Add the FID to the headers for the API call
     const headers = new Headers();
-    headers.append('X-Farcaster-User-FID', userFid.toString());
+    headers.append('X-Farcaster-User-FID', fid.toString());
     
     // Check if the user has already played this round
     const response = await fetch('/api/check-play-status', {
@@ -45,7 +42,7 @@ export async function checkUserPlayStatus(sdkContext: any): Promise<{
     const { timeUntilNextRound, userGuess } = data;
     
     if (!data.hasPlayed) {
-      console.log(`User ${userFid} has not played today`);
+      console.log(`User ${fid} has not played today`);
       return { 
         hasPlayed: false, 
         userGuess: null,
@@ -54,7 +51,7 @@ export async function checkUserPlayStatus(sdkContext: any): Promise<{
       };
     }
     
-    console.log(`User ${userFid} has already played today, guess data received:`, userGuess);
+    console.log(`User ${fid} has already played today, guess data received:`, userGuess);
     
     return { 
       hasPlayed: true, 
@@ -74,24 +71,23 @@ export async function checkUserPlayStatus(sdkContext: any): Promise<{
 
 /**
  * Submits a guess to the leaderboard and records the user's play
- * @param sdkContext - The Farcaster SDK context
+ * @param fid - The Farcaster user ID
+ * @param username - The Farcaster username
+ * @param pfpUrl - The Farcaster profile picture URL
  * @param guess - The user's guess with distance
  * @returns An object with success status and error message if any
  */
 export async function submitUserGuess(
-  sdkContext: any, 
+  fid: number | null,
+  username: string | null,
+  pfpUrl: string | null,
   guess: Guess
 ): Promise<{
   success: boolean;
   error: string | null;
 }> {
   try {
-    // Get FID from SDK context
-    const userFid = sdkContext?.user?.fid;
-    const username = getUserName() || sdkContext?.user?.username || sdkContext?.user?.displayName;
-    const pfpUrl = sdkContext?.user?.pfpUrl;
-    
-    console.log('Submitting score to leaderboard with FID from SDK:', userFid, 'and username:', username);
+    console.log('Submitting score to leaderboard with FID:', fid, 'and username:', username);
     
     // Create a valid name that doesn't exceed characters limit
     let userName = "Anonymous";
@@ -104,9 +100,9 @@ export async function submitUserGuess(
       if (userName.length > 30) {
         userName = userName.slice(0, 30);
       }
-    } else if (userFid) {
+    } else if (fid) {
       // Fall back to FID-based name if no username is available
-      userName = `User ${userFid.toString().slice(0, 15)}`;
+      userName = `User ${fid.toString().slice(0, 15)}`;
       // Further truncate if still too long
       if (userName.length > 30) {
         userName = userName.slice(0, 30);
@@ -117,7 +113,7 @@ export async function submitUserGuess(
     const leaderboardData = {
       name: userName,
       distance: guess.distance,
-      fid: userFid ? userFid.toString() : undefined, // Ensure fid is undefined if null or empty
+      fid: fid ? fid.toString() : undefined, // Ensure fid is undefined if null or empty
       position: guess.position, // Include the position of the guess
       pfpUrl: pfpUrl // Include the user's profile picture URL
     };
@@ -125,8 +121,8 @@ export async function submitUserGuess(
     // Create headers for API calls
     const headers = new Headers();
     headers.append('Content-Type', 'application/json');
-    if (userFid) {
-      headers.append('X-Farcaster-User-FID', userFid.toString());
+    if (fid) {
+      headers.append('X-Farcaster-User-FID', fid.toString());
     }
     
     // Submit to leaderboard
@@ -158,13 +154,13 @@ export async function submitUserGuess(
     // Store the user's guess data along with their play record
     // This is separate from leaderboard submission and should happen even if the leaderboard submission fails
     // except in the case of a duplicate submission
-    if (userFid && leaderboardResponse.status !== 403) {
+    if (fid && leaderboardResponse.status !== 403) {
       try {
         await fetch('/api/record-play', {
           method: 'POST',
           headers: headers,
           body: JSON.stringify({
-            fid: userFid.toString(),
+            fid: fid.toString(),
             guessData: guess
           }),
         });
