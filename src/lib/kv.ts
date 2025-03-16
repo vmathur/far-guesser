@@ -1,6 +1,6 @@
 import { FrameNotificationDetails } from "@farcaster/frame-sdk";
 import { Redis } from "@upstash/redis";
-import { ROUND_DURATION_MS } from './gameConfig';
+import { ROUND_DURATION_MS } from '../data/gameConfig';
 
 // Add better error handling for Redis configuration
 const createRedisClient = () => {

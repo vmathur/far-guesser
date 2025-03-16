@@ -7,7 +7,7 @@ import StreetView from './StreetView';
 import GuessingMap from './GuessingMap';
 import ResultsView from './ResultsView';
 import LeaderboardView from './LeaderboardView';
-import { gameConfig } from '../lib/gameConfig';
+import { gameConfig } from '../data/gameConfig';
 import { useGameAnalytics } from '../lib/analytics';
 import sdk from '@farcaster/frame-sdk';
 import { submitUserGuess } from '../lib/playStatusHelpers';

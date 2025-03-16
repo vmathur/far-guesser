@@ -3,7 +3,7 @@ import { CSSProperties } from 'react';
 import { signIn } from 'next-auth/react';
 import sdk from '@farcaster/frame-sdk';
 import { useGameAnalytics } from '~/lib/analytics';
-import { gameConfig } from '~/lib/gameConfig';
+import { gameConfig } from '~/data/gameConfig';
 import { motion } from 'framer-motion';
 
 interface RulesScreenProps {

@@ -1,9 +1,8 @@
 # 🖼️ FarGuesser.
 
 FarGuesser
-- refactor and get rid of code
-- consolidate guess and last play
-- optimize network calls
+- refactor fid code
+- consolidate guess, last play and notification
 - Add metadata to minting
 - Mixpanel
 
@@ -45,7 +44,7 @@ Copy `.env.local.example` to `.env.local` and update the values as needed.
 
 ### Game Configuration
 
-Game settings are configured in `src/lib/gameConfig.ts`:
+Game settings are configured in `src/data/gameConfig.ts`:
 
 - `ROUND_DURATION_MINUTES`: The duration of each game round in minutes (default: 360 = 6 hours). Users can only play once per round. Examples: 5 = 5 minutes, 60 = 1 hour, 1440 = 24 hours (1 day).
 - Additional game settings can be added to this file as needed.
