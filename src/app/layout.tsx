@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Patrick_Hand } from 'next/font/google';
-import { getSession } from "~/auth"
 import "~/app/globals.css";
 import { Providers } from "~/app/providers";
 import { Analytics } from '@vercel/analytics/react';
@@ -19,15 +18,13 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-  const session = await getSession()
-  
+}) {
   return (
     <html lang="en" className={patrickHand.className}>
       <body>
-        <Providers session={session}>{children}</Providers>
+        <Providers>{children}</Providers>
         <Analytics />
       </body>
     </html>

@@ -1,6 +1,6 @@
 import { useEffect, useState, FC } from 'react';
 import { CSSProperties } from 'react';
-import { useSession, signIn } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import sdk from '@farcaster/frame-sdk';
 import { useGameAnalytics } from '~/lib/analytics';
 import { gameConfig } from '~/lib/gameConfig';
@@ -33,24 +33,11 @@ type FrameSDKContext = {
   };
 }
 
-// Define a type for the session update event
-interface SessionUpdateEvent extends CustomEvent {
-  detail: {
-    session: any;
-    status: string;
-    sdkContext?: FrameSDKContext;
-  };
-}
-
 const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
-  const { data: session, status: authStatus } = useSession();
   const [playStatus, setPlayStatus] = useState<PlayStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [countdown, setCountdown] = useState<string>('');
   // Remove debug message state
-  // Track session from our custom event as a fallback
-  const [customSessionData, setCustomSessionData] = useState<any>(null);
-  const [customAuthStatus, setCustomAuthStatus] = useState<string>('loading');
   // Track SDK context
   const [sdkContext, setSdkContext] = useState<FrameSDKContext | null>(null);
   const analytics = useGameAnalytics();
@@ -75,30 +62,8 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, selectedFont }) => {
     
     loadSdkContext();
   }, []);
-  
-  // Listen for custom session update events
-  useEffect(() => {
-    const handleSessionUpdate = (event: SessionUpdateEvent) => {
-      setCustomSessionData(event.detail.session);
-      setCustomAuthStatus(event.detail.status);
-      if (event.detail.sdkContext) {
-        setSdkContext(event.detail.sdkContext);
-      }
-    };
-    
-    if (typeof window !== 'undefined') {
-      window.addEventListener('farGuesserSessionUpdate', handleSessionUpdate as EventListener);
-      
-      return () => {
-        window.removeEventListener('farGuesserSessionUpdate', handleSessionUpdate as EventListener);
-      };
-    }
-  }, []);
-  
-  // Get FID from SDK context first, then fall back to session
-  const userFid = sdkContext?.user?.fid || 
-                 session?.user?.fid || 
-                 customSessionData?.user?.fid;
+  // Get FID from SDK context
+  const userFid = sdkContext?.user?.fid
   
   // Fetch the play status only after we have a user FID
   useEffect(() => {

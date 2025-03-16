@@ -42,16 +42,6 @@ type FrameSDKContext = {
     };
   };
 }
-
-// Define a type for the session update event
-interface SessionUpdateEvent extends CustomEvent {
-  detail: {
-    session: any;
-    status: string;
-    sdkContext?: FrameSDKContext;
-  };
-}
-
 // Define a simple type for Google Maps objects
 type GoogleMapsInstance = any;
 
@@ -82,7 +72,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   const [loading, setLoading] = useState(true);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [sdkContext, setSdkContext] = useState<FrameSDKContext | null>(null);
-  const [customSessionData, setCustomSessionData] = useState<any>(null);
   const [score, setScore] = useState<number>(0);
   const [leaderboardPreview, setLeaderboardPreview] = useState<any[]>([]);
   const [leaderboardLoading, setLeaderboardLoading] = useState(true);
@@ -153,26 +142,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({
     
     loadSdkContext();
   }, []);
-  
-  // Listen for custom session update events
-  useEffect(() => {
-    const handleSessionUpdate = (event: SessionUpdateEvent) => {
-      console.log('ResultsView received session update:', event.detail);
-      setCustomSessionData(event.detail.session);
-      if (event.detail.sdkContext) {
-        setSdkContext(event.detail.sdkContext);
-      }
-    };
-    
-    if (typeof window !== 'undefined') {
-      window.addEventListener('farGuesserSessionUpdate', handleSessionUpdate as EventListener);
-      
-      return () => {
-        window.removeEventListener('farGuesserSessionUpdate', handleSessionUpdate as EventListener);
-      };
-    }
-  }, []);
-  
   // Track results_viewed event when component mounts
   useEffect(() => {
     if (guess?.distance) {

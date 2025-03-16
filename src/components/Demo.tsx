@@ -26,7 +26,6 @@ import { Button } from "~/components/ui/Button";
 import { truncateAddress } from "~/lib/truncateAddress";
 import { base, degen, mainnet, optimism } from "wagmi/chains";
 import { BaseError, UserRejectedRequestError } from "viem";
-import { useSession } from "next-auth/react"
 import { createStore } from 'mipd'
 import { Label } from "~/components/ui/label";
 
@@ -596,7 +595,6 @@ function SignIn() {
   const [signingOut, setSigningOut] = useState(false);
   const [signInResult, setSignInResult] = useState<SignInCore.SignInResult>();
   const [signInFailure, setSignInFailure] = useState<string>();
-  const { data: session, status } = useSession()
 
   const getNonce = useCallback(async () => {
     const nonce = await getCsrfToken();
@@ -611,12 +609,6 @@ function SignIn() {
       const nonce = await getNonce();
       const result = await sdk.actions.signIn({ nonce });
       setSignInResult(result);
-
-      await signIn("credentials", {
-        message: result.message,
-        signature: result.signature,
-        redirect: false,
-      });
     } catch (e) {
       if (e instanceof SignInCore.RejectedByUser) {
         setSignInFailure("Rejected by user");
@@ -632,7 +624,6 @@ function SignIn() {
   const handleSignOut = useCallback(async () => {
     try {
       setSigningOut(true);
-      await signOut({ redirect: false }) 
       setSignInResult(undefined);
     } finally {
       setSigningOut(false);
@@ -641,37 +632,23 @@ function SignIn() {
 
   return (
     <>
-      {status !== "authenticated" &&
-        <Button
-          onClick={handleSignIn}
-          disabled={signingIn}
-        >
-          Sign In with Farcaster
-        </Button>
-      }
-      {status === "authenticated" &&
+      <Button
+        onClick={handleSignIn}
+        disabled={signingIn}
+      >
+        Sign In with Farcaster
+      </Button>
+      {signInResult && (
         <Button
           onClick={handleSignOut}
           disabled={signingOut}
         >
           Sign out
         </Button>
-      }
-      {session &&
-        <div className="my-2 p-2 text-xs overflow-x-scroll bg-gray-100 rounded-lg font-mono">
-          <div className="font-semibold text-gray-500 mb-1">Session</div>
-          <div className="whitespace-pre">{JSON.stringify(session, null, 2)}</div>
-        </div>
-      }
-      {signInFailure && !signingIn && (
-        <div className="my-2 p-2 text-xs overflow-x-scroll bg-gray-100 rounded-lg font-mono">
-          <div className="font-semibold text-gray-500 mb-1">SIWF Result</div>
-          <div className="whitespace-pre">{signInFailure}</div>
-        </div>
       )}
-      {signInResult && !signingIn && (
+      {signInResult && (
         <div className="my-2 p-2 text-xs overflow-x-scroll bg-gray-100 rounded-lg font-mono">
-          <div className="font-semibold text-gray-500 mb-1">SIWF Result</div>
+          <div className="font-semibold text-gray-500 mb-1">Farcaster Sign In Result</div>
           <div className="whitespace-pre">{JSON.stringify(signInResult, null, 2)}</div>
         </div>
       )}

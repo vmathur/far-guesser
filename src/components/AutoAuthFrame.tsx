@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import sdk, { FrameNotificationDetails } from "@farcaster/frame-sdk";
-import { useSession } from "next-auth/react";
 import { setUserNotificationDetails } from "~/lib/kv";
 import { useAnalytics } from "~/lib/AnalyticsContext";
 
@@ -21,22 +20,6 @@ type FrameSDKContext = {
     };
   };
 }
-
-// Create a custom event to broadcast session and SDK context changes
-export const broadcastSessionUpdate = (sessionData: any, sdkContext?: FrameSDKContext) => {
-  if (typeof window !== 'undefined') {
-    console.log('Broadcasting session update:', sessionData, 'SDK Context:', sdkContext);
-    // Create a custom event with the session data and SDK context
-    const event = new CustomEvent('session-update', { 
-      detail: {
-        session: sessionData,
-        status: sessionData?.status,
-        sdkContext: sdkContext
-      }
-    });
-    window.dispatchEvent(event);
-  }
-};
 
 // FarcasterRequiredPopup component
 const FarcasterRequiredPopup = () => {
@@ -63,7 +46,6 @@ const FarcasterRequiredPopup = () => {
 };
 
 export default function AutoAuthFrame() {  
-  const { data: session, status } = useSession();
   const [isSDKLoaded, setIsSDKLoaded] = useState(false);
   const [isFrameAdded, setIsFrameAdded] = useState(false);
   const [notificationDetails, setNotificationDetails] = useState<FrameNotificationDetails | null>(null);
@@ -100,10 +82,7 @@ export default function AutoAuthFrame() {
           // Show popup if not in Farcaster after a short delay
           if (!isFarcaster) {
             setTimeout(() => setShowPopup(true), 1000);
-          }
-          
-          // Broadcast the context
-          broadcastSessionUpdate({ status }, context);
+          } 
         }
       } catch (error) {
         // If there's an error loading the SDK context, we're likely not in Farcaster
@@ -113,14 +92,7 @@ export default function AutoAuthFrame() {
     };
     
     loadSdkContext();
-  }, [setFid, setUsername, status]);
-
-  // Broadcast session updates whenever the session changes or SDK context is available
-  useEffect(() => {
-    if (status !== 'loading') {
-      broadcastSessionUpdate({ session, status }, sdkContext);
-    }
-  }, [session, status, sdkContext]);
+  }, [setFid, setUsername]);
 
   // Automatically add the frame to the client
   const autoAddFrame = useCallback(async () => {

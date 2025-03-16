@@ -1,0 +1,67 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+
+contract FarguesserNFT is ERC721, Ownable, ReentrancyGuard {
+    // Mint fee (set to 0.00001 Ether)
+    uint256 public mintFee = 0.00001 ether;
+    // Counter for token IDs
+    uint256 public nextTokenId;
+    // Address that will receive the withdrawn funds
+    address public withdrawAddress;
+
+    event NFTMinted(address indexed minter, uint256 tokenId);
+    event Withdrawn(address indexed to, uint256 amount);
+    event WithdrawAddressChanged(address indexed newWithdrawAddress);
+    event MintFeeChanged(uint256 newMintFee);
+
+    constructor() ERC721("farguesserNFT", "FGNFT") Ownable(msg.sender) {
+        // Set the deployer as the initial withdraw address
+        withdrawAddress = msg.sender;
+    }
+
+    /// @notice Mint a new NFT by paying the mint fee.
+    /// The fee is collected and stored in the contract.
+    function mint() external payable {
+        require(msg.value >= mintFee, "Insufficient fee sent");
+
+        // Mint the NFT to the sender
+        uint256 tokenId = nextTokenId;
+        nextTokenId++;
+        _safeMint(msg.sender, tokenId);
+
+        emit NFTMinted(msg.sender, tokenId);
+    }
+
+    /// @notice Withdraw all collected fees to the current withdraw address.
+    /// Only the owner can call this function.
+    function withdraw() external onlyOwner nonReentrant {
+        uint256 balance = address(this).balance;
+        require(balance > 0, "No funds available for withdrawal");
+
+        (bool success, ) = withdrawAddress.call{value: balance}("");
+        require(success, "Withdrawal failed");
+
+        emit Withdrawn(withdrawAddress, balance);
+    }
+
+    /// @notice Update the address where withdrawn funds should be sent.
+    /// Only the owner can call this function.
+    /// @param _newAddress The new beneficiary address.
+    function setWithdrawAddress(address _newAddress) external onlyOwner {
+        require(_newAddress != address(0), "Invalid address");
+        withdrawAddress = _newAddress;
+        emit WithdrawAddressChanged(_newAddress);
+    }
+    
+    /// @notice Update the mint fee.
+    /// Only the owner can call this function.
+    /// @param _mintFee The new mint fee.
+    function setMintFee(uint256 _mintFee) external onlyOwner {
+        mintFee = _mintFee;
+        emit MintFeeChanged(_mintFee);
+    }
+}
