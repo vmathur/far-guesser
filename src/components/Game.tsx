@@ -8,6 +8,7 @@ import { Location } from './types/LocationGuesserTypes';
 import { useGameAnalytics } from '~/lib/analytics';
 import sdk from '@farcaster/frame-sdk';
 import { checkUserPlayStatus } from '~/lib/playStatusHelpers';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Use dynamic import for the LocationGuesserView component to avoid SSR issues
 const LocationGuesserView = dynamic(() => import('./LocationGuesserView'), {
@@ -29,6 +30,36 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
   const [username, setUsername] = useState<string | null>(null);
   const analytics = useGameAnalytics();
   
+  // Animation variants
+  const pageVariants = {
+    initial: {
+      opacity: 0,
+      scale: 0.8,
+      rotateY: -15,
+      z: -100
+    },
+    in: {
+      opacity: 1,
+      scale: 1,
+      rotateY: 0,
+      z: 0,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut"
+      }
+    },
+    out: {
+      opacity: 0,
+      scale: 1.2,
+      rotateY: 15,
+      z: 100,
+      transition: {
+        duration: 0.5,
+        ease: "easeIn"
+      }
+    }
+  };
+  
   const styles: Record<string, CSSProperties> = {
     container: {
       textAlign: 'center' as const,
@@ -37,6 +68,8 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
       borderRadius: '8px',
       maxWidth: '800px',
       margin: '0 auto',
+      perspective: '1000px',
+      overflow: 'hidden',
     },
     loading: {
       display: 'flex',
@@ -129,32 +162,69 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
       case 'loading':
         return <div style={styles.loading}>Loading...</div>;
       case 'rules':
-        return <RulesScreen onPlay={handlePlay} fid={fid} />;
+        return (
+          <motion.div
+            key="rules"
+            initial="initial"
+            animate="in"
+            // exit="out"
+            variants={pageVariants}
+          >
+            <RulesScreen onPlay={handlePlay} fid={fid} />
+          </motion.div>
+        );
       case 'playing':
         return (
-          <LocationGuesserView 
-            dailyLocation={dailyLocation} 
-            onGameComplete={handleGameComplete}
-            initialGameState="viewing"
-            fid={fid}
-            username={username}
-            pfpUrl={pfpUrl}
-          />
+          <motion.div
+            key="playing"
+            initial="initial"
+            animate="in"
+            // exit="out"
+            variants={pageVariants}
+          >
+            <LocationGuesserView 
+              dailyLocation={dailyLocation} 
+              onGameComplete={handleGameComplete}
+              initialGameState="viewing"
+              fid={fid}
+              username={username}
+              pfpUrl={pfpUrl}
+            />
+          </motion.div>
         );
       case 'results':
         return (
-          <LocationGuesserView 
-            dailyLocation={dailyLocation}
-            initialGameState="results"
-            initialGuess={userGuess}
-            timeUntilNextRound={timeUntilNextRound}
-            fid={fid}
-            username={username}
-            pfpUrl={pfpUrl}
-          />
+          <motion.div
+            key="results"
+            initial="initial"
+            animate="in"
+            // exit="out"
+            variants={pageVariants}
+          >
+            <LocationGuesserView 
+              dailyLocation={dailyLocation}
+              initialGameState="results"
+              initialGuess={userGuess}
+              timeUntilNextRound={timeUntilNextRound}
+              fid={fid}
+              username={username}
+              pfpUrl={pfpUrl}
+            />
+          </motion.div>
         );
       default:
-        return <div style={styles.loading}>Something went wrong</div>;
+        return (
+          <motion.div
+            key="error"
+            initial="initial"
+            animate="in"
+            // exit="out"
+            variants={pageVariants}
+            style={styles.loading}
+          >
+            Something went wrong
+          </motion.div>
+        );
     }
   };
 
@@ -167,7 +237,9 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
       <AutoAuthFrame />
       
       <div style={styles.container}>
-        {renderGameFlow()}
+        <AnimatePresence mode="wait">
+          {renderGameFlow()}
+        </AnimatePresence>
       </div>
     </>
   );

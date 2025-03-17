@@ -1,8 +1,8 @@
 # 🖼️ FarGuesser
 
 FarGuesser
-- Add image
 - Mixpanel
+- Add image to NFT
 
 maybe:
 - add click on map to show username

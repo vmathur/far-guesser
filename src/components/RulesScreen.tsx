@@ -28,16 +28,13 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, fid }) => {
       padding: '0',
       margin: '0',
       width: '100%',
-      height: '100vh',
+      height: '100%',
+      minHeight: '500px',
       backgroundImage: 'url("/map.jpg")',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat',
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
+      position: 'relative',
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
@@ -69,13 +66,11 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, fid }) => {
     },
     rulesContainer: {
       textAlign: 'left',
-      // backgroundColor: 'rgba(255, 255, 255, 0.7)',
       borderRadius: '10px',
       marginBottom: '30px',
     },
     rule: {
       position: 'relative' as const,
-      // backgroundColor: 'rgba(255, 255, 255, 0.7)',
       padding: '15px 15px 15px 15px',
       margin: '10px 0',
       borderRadius: '10px',
@@ -127,19 +122,6 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, fid }) => {
     }
   };
 
-  // Add useEffect to handle body overflow
-  useEffect(() => {
-    // Add overflow: hidden to both html and body
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
-
-    // Cleanup function to remove the styles when component unmounts
-    return () => {
-      document.documentElement.style.overflow = '';
-      document.body.style.overflow = '';
-    };
-  }, []);
-
   const handlePlayClick = () => {
     // Track the game_started event
     analytics.gameStarted();
@@ -151,8 +133,6 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, fid }) => {
     <div style={styles.container}>
       <div style={styles.overlay}></div>
       <div style={styles.contentContainer}>
-        {/* <h1 style={styles.title}>🔎 FarGuesser</h1> */}
-        
         <div style={styles.rulesContainer}>
           <p style={styles.rule}>
             1. Explore a mystery location for {Math.round(gameConfig.VIEWING_TIME_MS / 1000)} seconds
@@ -174,6 +154,10 @@ const RulesScreen: FC<RulesScreenProps> = ({ onPlay, fid }) => {
                 className="bg-green-500 text-white font-bold py-3 px-8 rounded-lg text-lg select-none touch-none"
                 initial={{ 
                   boxShadow: "0px 5px 0px  rgba(0, 0, 0, 0.5), 0px 5px 10px rgba(0, 0, 0, 0.5)" 
+                }}
+                whileHover={{
+                  scale: 1.05,
+                  transition: { duration: 0.2 }
                 }}
                 whileTap={{ 
                   y: 5,
