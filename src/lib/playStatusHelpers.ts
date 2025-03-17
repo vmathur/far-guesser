@@ -23,8 +23,6 @@ export async function checkUserPlayStatus(fid: number | null): Promise<{
         error: null 
       };
     }
-
-    console.log(`Checking if user ${fid} has played`);
     
     // Add the FID to the headers for the API call
     const headers = new Headers();

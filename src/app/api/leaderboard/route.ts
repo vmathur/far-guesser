@@ -100,8 +100,12 @@ export async function POST(request: NextRequest) {
           );
         }
         
+        const guessData = {
+          position: result.data.position,
+          distance: result.data.distance
+        };
         // If they haven't played yet, record that they're playing now
-        await recordUserPlay(userFid);
+        await recordUserPlay(userFid, guessData);
       } else {
         console.warn(`Invalid FID format: ${userFidStr}. Allowing score submission without play tracking.`);
       }

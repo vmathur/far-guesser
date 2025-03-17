@@ -92,14 +92,14 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
       try {
         if (sdk) {
           const context = await sdk.context;
-          console.log('Game component loaded SDK Context:', context);
+          console.log('SDK Context:', context);
           
           // Extract and save user information
           if (context?.user) {
             setFid(context.user.fid || null);
             setPfpUrl(context.user.pfpUrl || null);
             setUsername(context.user.username || null);
-            console.log('User info extracted:', {
+            console.log('User info:', {
               fid: context.user.fid,
               pfpUrl: context.user.pfpUrl,
               username: context.user.username

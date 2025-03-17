@@ -31,7 +31,6 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   const [dailyLeaderboard, setDailyLeaderboard] = useState<any[]>([]);
   const analytics = useGameAnalytics();
   const [otherUsersGuesses, setOtherUsersGuesses] = useState<UserGuess[]>([]);
-  console.log("Component rendering"); // Will run on every render
 
   // Track results_viewed event when component mounts
   useEffect(() => {
