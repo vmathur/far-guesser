@@ -128,6 +128,44 @@ export const abi = [
 	{
 		"inputs": [
 			{
+				"internalType": "int256",
+				"name": "_guessX",
+				"type": "int256"
+			},
+			{
+				"internalType": "int256",
+				"name": "_guessY",
+				"type": "int256"
+			},
+			{
+				"internalType": "int256",
+				"name": "_actualX",
+				"type": "int256"
+			},
+			{
+				"internalType": "int256",
+				"name": "_actualY",
+				"type": "int256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_score",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_distance",
+				"type": "uint256"
+			}
+		],
+		"name": "mint",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "address",
 				"name": "owner",
 				"type": "address"
@@ -196,81 +234,6 @@ export const abi = [
 		],
 		"name": "ApprovalForAll",
 		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "_fromTokenId",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "_toTokenId",
-				"type": "uint256"
-			}
-		],
-		"name": "BatchMetadataUpdate",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "_tokenId",
-				"type": "uint256"
-			}
-		],
-		"name": "MetadataUpdate",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "int256",
-				"name": "_guessX",
-				"type": "int256"
-			},
-			{
-				"internalType": "int256",
-				"name": "_guessY",
-				"type": "int256"
-			},
-			{
-				"internalType": "int256",
-				"name": "_actualX",
-				"type": "int256"
-			},
-			{
-				"internalType": "int256",
-				"name": "_actualY",
-				"type": "int256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_score",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_distance",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "_tokenURI",
-				"type": "string"
-			}
-		],
-		"name": "mint",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
 	},
 	{
 		"anonymous": false,

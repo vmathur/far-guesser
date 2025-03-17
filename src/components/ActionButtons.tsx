@@ -16,7 +16,11 @@ interface ActionButtonsProps {
   distance: number;
 }
 
-const contractAddress = '0xf01309b71076e7b9b184ac0416ae5795ac0ad3af';
+//v3
+const contractAddress = '0x420C81aB08BfA6D32369759CD019DBB706B85a58'
+//v2
+//const contractAddress = '0xf01309b71076e7b9b184ac0416ae5795ac0ad3af';
+//v1
 //const contractAddress = '0x247757adefbf623b7762102da57ec881de308eea';
 
 const ActionButtons: React.FC<ActionButtonsProps> = ({ guess, actualLocation, distance }) => {
@@ -84,7 +88,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ guess, actualLocation, di
           BigInt(Math.round(actual_y_location * 10000000)), // Convert to int256, scaled by 10^7
           BigInt(score), // uint256 score
           BigInt(Math.round(distance)), // uint256 distance in km
-          "https://far-guesser.vercel.app/onchain/tokenImage.png" // tokenURI parameter
+          "https://far-guesser.vercel.app/onchain/metadata.jsong" // tokenURI parameter
         ]
       });
 
