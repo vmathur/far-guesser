@@ -62,5 +62,10 @@ export const useGameAnalytics = () => {
     leaderboardViewed: (props?: Record<string, any>) => {
       trackEvent('leaderboard_viewed', props);
     },
+
+    // NFT minted event with score
+    mintedScore: (props: { score: number, distance: number, txHash: string } & Record<string, any>) => {
+      trackEvent('nft_minted', props);
+    },
   };
 }; 

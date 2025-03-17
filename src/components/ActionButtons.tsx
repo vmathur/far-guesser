@@ -96,6 +96,8 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ guess, actualLocation, di
         {
           onSuccess: (hash) => {
             console.log('minted '+hash);
+            // Track the minting event with the score
+            analytics.mintedScore({ score, distance, txHash: hash });
             setIsMinting(false);
             setIsMinted(true);
           },

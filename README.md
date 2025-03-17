@@ -1,12 +1,7 @@
 # 🖼️ FarGuesser
 
 FarGuesser
-- Mixpanel
 - Add image to NFT
-
-maybe:
-- add click on map to show username
-- show collected nfts
 
       payload: "eyJkb21haW4iOiJmZDljMmMyY2JlNzcubmdyb2suYXBwIn0",
       signature: "MHgzNzVkZjJmNDI3MjRmNDI2NjMxMGFlOWVkMWMwZWQyMTZiMjFhYzBiMmIyYTNmZWM3NjhjZDEzZGY5N2Y3MGVjNWQwOWExYjk0NTM0NmJmNTBjYTA3N2NjZGRiMzQxNTUxNmM1MTAwN2M3ZDZjNGM5NDExYzMyY2YzY2ZjZTM4YTFi"
