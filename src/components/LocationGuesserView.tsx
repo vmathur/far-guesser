@@ -149,6 +149,7 @@ const LocationGuesserView: React.FC<LocationGuesserViewProps> = ({
         return guess ? (
           <ResultsView
             guess={guess}
+            pfpUrl={pfpUrl}
             actualLocation={dailyLocation}
             onNextLocation={handleNextLocation}
             errorMessage={errorMessage}

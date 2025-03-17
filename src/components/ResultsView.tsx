@@ -10,6 +10,7 @@ import ActionButtons from './ActionButtons';
 
 interface ResultsViewProps {
   guess: Guess;
+  pfpUrl: string;
   actualLocation: Location;
   onNextLocation: () => void;
   errorMessage?: string | null;
@@ -19,6 +20,7 @@ interface ResultsViewProps {
 
 const ResultsView: React.FC<ResultsViewProps> = ({ 
   guess, 
+  pfpUrl,
   actualLocation, 
   onNextLocation,
   errorMessage = null,
@@ -135,6 +137,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
       {/* Results Map */}
       <ResultsMap 
         guess={guess}
+        pfpUrl={pfpUrl}
         actualLocation={actualLocation}
         otherUsersGuesses={otherUsersGuesses}
         timeUntilNextRound={timeUntilNextRound}

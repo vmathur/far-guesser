@@ -8,6 +8,7 @@ import CountdownTimer from './CountdownTimer';
 
 interface ResultsMapProps {
   guess: Guess;
+  pfpUrl: string;
   actualLocation: Location;
   otherUsersGuesses: UserGuess[];
   timeUntilNextRound?: number;
@@ -16,6 +17,7 @@ interface ResultsMapProps {
 
 const ResultsMap: React.FC<ResultsMapProps> = ({
   guess,
+  pfpUrl,
   actualLocation,
   otherUsersGuesses,
   timeUntilNextRound,
@@ -154,22 +156,79 @@ const ResultsMap: React.FC<ResultsMapProps> = ({
 
     const map = googleMapRef.current;
     const maps = window.google.maps as any;
-
-    // User's guess marker (red)
-    new maps.Marker({
-      position: guess.position,
-      map,
-      icon: {
-        path: maps.SymbolPath.CIRCLE,
-        scale: 14,
-        fillColor: "#FF0000",
-        fillOpacity: 0.8,
-        strokeWeight: 3,
-        strokeColor: "#FFFFFF"
-      },
-      title: "Your guess"
-    });
     
+    // Try to create a profile picture marker for user's guess if pfpUrl is provided
+    if (pfpUrl) {
+      try {
+        // Create a canvas to make a circular image
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const size = 96; // Larger size for better quality
+        canvas.width = size;
+        canvas.height = size;
+        
+        // Create a new Image element
+        const img = new Image();
+        img.crossOrigin = 'Anonymous'; // Try to avoid CORS issues
+        
+        img.onload = () => {
+          // Draw circular image on canvas
+          if (ctx) {
+            // Draw circle
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size/2, 0, Math.PI * 2, true);
+            ctx.closePath();
+            ctx.clip();
+            
+            // Draw white circle border
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 6;
+            ctx.stroke();
+            
+            // Draw the image
+            ctx.drawImage(img, 0, 0, size, size);
+            
+            try {
+              // Convert canvas to data URL
+              const dataUrl = canvas.toDataURL('image/png');
+              
+              // Create marker with circular image
+              const markerIcon = {
+                url: dataUrl,
+                scaledSize: new maps.Size(48, 48),
+                origin: new maps.Point(0, 0),
+                anchor: new maps.Point(24, 24)
+              };
+              
+              // Create enhanced marker with user's profile picture
+              new maps.Marker({
+                position: guess.position,
+                map,
+                icon: markerIcon,
+                title: "Your guess",
+                zIndex: 900 // Higher than the fallback marker
+              });
+              
+            } catch (canvasError) {
+              console.warn("Canvas operation failed for user's guess marker:", canvasError);
+              // Fallback was already created, so no additional action needed
+            }
+          }
+        };
+        
+        img.onerror = () => {
+          console.warn(`Failed to load user's profile picture for marker: ${pfpUrl}`);
+          // Fallback already created, so no additional action needed
+        };
+                
+        // Set the source to trigger the load
+        img.src = pfpUrl;
+      } catch (error) {
+        console.warn("Failed to create enhanced marker for user's guess:", error);
+        // Fallback already created, so we're good
+      }
+    }
+
     // Create the actual location marker using the default Google Maps pin
     const actualLocationMarker = new maps.Marker({
       position: actualLocation.position,
