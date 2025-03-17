@@ -130,7 +130,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
       </div>
       
       {/* Action Buttons for Mint and Share */}
-      <ActionButtons distance={guess.distance} />
+      <ActionButtons guess={guess} actualLocation={actualLocation} distance={guess.distance} />
       
       {/* Results Map */}
       <ResultsMap 

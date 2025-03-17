@@ -1,7 +1,7 @@
 # 🖼️ FarGuesser
 
 FarGuesser
-- Add metadata to minting
+- Add image
 - Mixpanel
 
 maybe:

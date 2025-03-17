@@ -1,3 +1,4 @@
+
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
@@ -13,29 +14,7 @@ contract FarguesserNFT is ERC721, Ownable, ReentrancyGuard {
     // Address that will receive the withdrawn funds
     address public withdrawAddress;
 
-    // Struct to store mint parameters for each NFT
-    struct MintData {
-        int256 guess_x_location;
-        int256 guess_y_location;
-        int256 actual_x_location;
-        int256 actual_y_location;
-        uint256 score;
-        uint256 distance;
-    }
-
-    // Mapping from token ID to its mint data
-    mapping(uint256 => MintData) public tokenMintData;
-
-    event NFTMinted(
-        address indexed minter,
-        uint256 tokenId,
-        int256 guess_x_location,
-        int256 guess_y_location,
-        int256 actual_x_location,
-        int256 actual_y_location,
-        uint256 score,
-        uint256 distance
-    );
+    event NFTMinted(address indexed minter, uint256 tokenId);
     event Withdrawn(address indexed to, uint256 amount);
     event WithdrawAddressChanged(address indexed newWithdrawAddress);
     event MintFeeChanged(uint256 newMintFee);
@@ -45,40 +24,17 @@ contract FarguesserNFT is ERC721, Ownable, ReentrancyGuard {
         withdrawAddress = msg.sender;
     }
 
-    /// @notice Mint a new NFT by paying the mint fee and providing location and score data.
-    /// @param _guessX The guessed x-coordinate.
-    /// @param _guessY The guessed y-coordinate.
-    /// @param _actualX The actual x-coordinate.
-    /// @param _actualY The actual y-coordinate.
-    /// @param _score The score.
-    /// @param _distance The distance.
-    function mint(
-        int256 _guessX,
-        int256 _guessY,
-        int256 _actualX,
-        int256 _actualY,
-        uint256 _score,
-        uint256 _distance
-    ) external payable {
+    /// @notice Mint a new NFT by paying the mint fee.
+    /// The fee is collected and stored in the contract.
+    function mint() external payable {
         require(msg.value >= mintFee, "Insufficient fee sent");
 
+        // Mint the NFT to the sender
         uint256 tokenId = nextTokenId;
         nextTokenId++;
-
-        // Store the mint parameters in the mapping for later retrieval
-        tokenMintData[tokenId] = MintData({
-            guess_x_location: _guessX,
-            guess_y_location: _guessY,
-            actual_x_location: _actualX,
-            actual_y_location: _actualY,
-            score: _score,
-            distance: _distance
-        });
-
-        // Mint the NFT to the sender
         _safeMint(msg.sender, tokenId);
 
-        emit NFTMinted(msg.sender, tokenId, _guessX, _guessY, _actualX, _actualY, _score, _distance);
+        emit NFTMinted(msg.sender, tokenId);
     }
 
     /// @notice Withdraw all collected fees to the current withdraw address.
