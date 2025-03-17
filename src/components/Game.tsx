@@ -44,7 +44,7 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
       rotateY: 0,
       z: 0,
       transition: {
-        duration: 0.5,
+        duration: 0.1,
         ease: "easeOut"
       }
     },
@@ -54,7 +54,7 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
       rotateY: 15,
       z: 100,
       transition: {
-        duration: 0.5,
+        duration: 0.1,
         ease: "easeIn"
       }
     }
@@ -167,7 +167,6 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
             key="rules"
             initial="initial"
             animate="in"
-            // exit="out"
             variants={pageVariants}
           >
             <RulesScreen onPlay={handlePlay} fid={fid} />
@@ -179,7 +178,6 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
             key="playing"
             initial="initial"
             animate="in"
-            // exit="out"
             variants={pageVariants}
           >
             <LocationGuesserView 
@@ -198,7 +196,6 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
             key="results"
             initial="initial"
             animate="in"
-            // exit="out"
             variants={pageVariants}
           >
             <LocationGuesserView 
@@ -218,7 +215,6 @@ const FarGuesser = ({ dailyLocation }: GameProps) => {
             key="error"
             initial="initial"
             animate="in"
-            // exit="out"
             variants={pageVariants}
             style={styles.loading}
           >
