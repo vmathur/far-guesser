@@ -83,7 +83,8 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ guess, actualLocation, di
           BigInt(Math.round(actual_x_location * 10000000)), // Convert to int256, scaled by 10^7
           BigInt(Math.round(actual_y_location * 10000000)), // Convert to int256, scaled by 10^7
           BigInt(score), // uint256 score
-          BigInt(Math.round(distance)) // uint256 distance in km
+          BigInt(Math.round(distance)), // uint256 distance in km
+          "https://far-guesser.vercel.app/onchain/tokenImage.png" // tokenURI parameter
         ]
       });
 
