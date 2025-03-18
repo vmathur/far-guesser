@@ -14,9 +14,7 @@ const LOCATION_INDEX_KEY = 'current-location-index';
 export async function getDailyLocation(): Promise<Location> {
   try {
     // Try to get the current location index from KV storage
-    console.log('Getting location index from KV storage');
     const locationIndex = await kv.get<number>(LOCATION_INDEX_KEY);
-    console.log('Location index:', locationIndex);
     if (locationIndex !== null && locationIndex !== undefined) {
       // Get the location using the stored index
       const location = getLocationByIndex(locationIndex);

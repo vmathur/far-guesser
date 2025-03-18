@@ -3,6 +3,7 @@ import { getLocationByIndex, gameLocations } from '../../../data/gameLocations';
 import { kv } from '@vercel/kv';
 import { sendNotificationToAllSubscribers } from '../../../lib/notifs';
 import { LOCATION_INDEX_KEY, LOCATION_UPDATED_KEY } from '../../../lib/kv';
+import { revalidatePath } from 'next/cache';
 
 // Key for storing the current location index
 // const LOCATION_INDEX_KEY = 'current-location-index';
@@ -64,6 +65,9 @@ export async function GET(request: Request) {
     // Store the update timestamp
     const now = new Date();
     await kv.set(LOCATION_UPDATED_KEY, now.toISOString());
+    
+    // Revalidate the home page to ensure it shows the new location
+    revalidatePath('/');
     
     // Send a notification to all users who have added the frame
     try {

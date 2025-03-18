@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { resetAll } from "~/lib/kv";
+import { revalidatePath } from 'next/cache';
 
 // Environment variable containing the admin API key
 const ADMIN_API_KEY = process.env.ADMIN_API_KEY;
@@ -30,6 +31,9 @@ export async function POST(request: NextRequest) {
 
     // If authentication is successful, reset all game data
     await resetAll();
+
+    // Revalidate the home page to ensure it shows the updated state
+    revalidatePath('/');
 
     // Return success response
     return Response.json({ 

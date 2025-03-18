@@ -41,9 +41,7 @@ export default async function Home() {
   // Get today's location
   let dailyLocation;
   try {
-    console.log('Fetching daily location');
     dailyLocation = await getDailyLocation();
-    console.log('Daily location fetched:', dailyLocation);
   } catch (error) {
     console.error("Error fetching daily location:", error);
     // Fallback to the first location in the list if there's an error
