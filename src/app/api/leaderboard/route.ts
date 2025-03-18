@@ -11,7 +11,7 @@ import { z } from "zod";
 // Schema for score submission
 const scoreSubmissionSchema = z.object({
   name: z.string().min(1).max(50),
-  distance: z.number().positive(),
+  distance: z.number().gte(0),
   fid: z.string().optional().nullable(),
   position: z.object({
     lat: z.number(),

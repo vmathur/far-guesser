@@ -65,7 +65,12 @@ export const useGameAnalytics = () => {
 
     // NFT minted event with score
     mintedScore: (props: { score: number, distance: number, txHash: string } & Record<string, any>) => {
-      trackEvent('nft_minted', props);
+      // Allow distance to be 0 by ensuring it's a number (can be 0 or positive)
+      const eventProps = {
+        ...props,
+        distance: typeof props.distance === 'number' ? props.distance : 0
+      };
+      trackEvent('nft_minted', eventProps);
     },
   };
 }; 
