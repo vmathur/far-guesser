@@ -96,7 +96,8 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ guess, actualLocation, di
         {
           to: contractAddress,
           data: data,
-          value: BigInt("10000000000000") // Mint fee
+          // value: BigInt("10000000000000") // Mint fee
+          value: BigInt("300000000000000") // Mint fee
         },
         {
           onSuccess: (hash) => {
