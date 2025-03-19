@@ -18,6 +18,11 @@ export const gameLocations: GameLocation[] = [
     hint: 'Beach'
   },
   { 
+    position: { lat: 45.4215, lng: -75.6972 }, 
+    answer: 'Ottawa', 
+    hint: 'Parliament Hill' 
+  },
+  { 
     position: { lat: 1.283404, lng: 103.863134 }, 
     answer: 'Singapore', 
     hint: 'Marina Bay'
@@ -86,11 +91,6 @@ export const gameLocations: GameLocation[] = [
     position: { lat: 13.7563, lng: 100.5018 }, 
     answer: 'Bangkok', 
     hint: 'Grand Palace' 
-  },
-  { 
-    position: { lat: 45.4215, lng: -75.6972 }, 
-    answer: 'Ottawa', 
-    hint: 'Parliament Hill' 
   },
   { 
     position: { lat: -34.6037, lng: -58.3816 }, 
