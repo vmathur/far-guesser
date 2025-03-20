@@ -23,6 +23,11 @@ export const gameLocations: GameLocation[] = [
     hint: 'Parliament Hill' 
   },
   { 
+    position: { lat: 55.860085, lng: -4.265149 }, 
+    answer: 'Glasgow', 
+    hint: 'UK'
+  },  
+  { 
     position: { lat: 1.283404, lng: 103.863134 }, 
     answer: 'Singapore', 
     hint: 'Marina Bay'

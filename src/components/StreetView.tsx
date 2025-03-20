@@ -113,7 +113,7 @@ const StreetView: React.FC<StreetViewProps> = ({
         </p>
       <div 
         style={{ 
-          height: '500px', 
+          height: '550px', 
           width: '100%', 
           borderRadius: '8px',
           boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
