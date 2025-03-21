@@ -26,7 +26,12 @@ export const gameLocations: GameLocation[] = [
     position: { lat: 55.860085, lng: -4.265149 }, 
     answer: 'Glasgow', 
     hint: 'UK'
-  },  
+  },
+  { 
+    position: { lat: 32.759035, lng: 130.276722 }, 
+    answer: 'Fukuoka', 
+    hint: 'Japan'
+  },
   { 
     position: { lat: 1.283404, lng: 103.863134 }, 
     answer: 'Singapore', 

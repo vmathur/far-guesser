@@ -59,27 +59,40 @@ function getUserDataKey(fid: number): string {
  */
 export async function getAllSubscribedUserFids(): Promise<number[]> {
   try {
-    const userKeys = await redis.keys('far-guesser:user:*');
+    // Use SCAN instead of KEYS for better performance with large datasets
+    const userFids: number[] = [];
+    let cursor = 0;
     
-    if (!userKeys || !Array.isArray(userKeys) || userKeys.length === 0) {
-      console.log('No user keys found or unexpected response format:', userKeys);
-      return [];
-    }
+    do {
+      // Scan for keys with pattern and get data in chunks
+      const [nextCursor, keys] = await redis.scan(cursor, {
+        match: 'far-guesser:user:*',
+        count: 100
+      });
+      
+      cursor = parseInt(nextCursor, 10);
+      
+      if (keys.length > 0) {
+        // Get user data for all keys in this batch
+        const userDataPromises = keys.map(key => {
+          const fidStr = key.split(':').pop();
+          const fid = parseInt(fidStr || '0', 10);
+          return redis.get<ConsolidatedUserData>(key).then(data => ({ fid, data }));
+        });
+        
+        const batchUserData = await Promise.all(userDataPromises);
+        
+        // Filter for users with notification details and add to results
+        userFids.push(
+          ...batchUserData
+            .filter(item => item.data && item.data.notification)
+            .map(item => item.fid)
+            .filter(fid => fid > 0)
+        );
+      }
+    } while (cursor !== 0); // Continue until cursor returns 0
     
-    // Get all users with notification data
-    const userDataPromises = userKeys.map(key => {
-      const fidStr = key.split(':').pop();
-      const fid = parseInt(fidStr || '0', 10);
-      return redis.get<ConsolidatedUserData>(key).then(data => ({ fid, data }));
-    });
-    
-    const userData = await Promise.all(userDataPromises);
-    
-    // Filter for users that have notification details
-    return userData
-      .filter(item => item.data && item.data.notification)
-      .map(item => item.fid)
-      .filter(fid => fid > 0);
+    return userFids;
   } catch (error) {
     console.error('Error getting subscribed user FIDs:', error);
     return [];
