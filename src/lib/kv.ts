@@ -216,8 +216,8 @@ async function updateLeaderboard(leaderboardKey: string, entry: LeaderboardEntry
   // Sort by score (higher is better for our calculated score)
   leaderboard.sort((a, b) => b.score - a.score);
   
-  // Limit to top 100 scores
-  const topScores = leaderboard.slice(0, 100);
+  // Limit to top 2000 scores
+  const topScores = leaderboard.slice(0, 2000);
   
   // Store back in KV
   await redis.set(leaderboardKey, topScores);
