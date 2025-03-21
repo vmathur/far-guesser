@@ -291,53 +291,8 @@ const ResultsMap: React.FC<ResultsMapProps> = ({
     // Add markers for other users' guesses
     otherUsersGuesses.forEach(userGuess => {
       try {
-        // Create a reliable marker first, to ensure something shows up regardless of pfp loading
-        const fallbackMarkerIcon = {
-          path: maps.SymbolPath.CIRCLE,
-          scale: 14,
-          fillColor: "#3B82F6",  // Blue color
-          fillOpacity: 0.8,
-          strokeWeight: 2,
-          strokeColor: "#FFFFFF"
-        };
-        
-        const marker = new maps.Marker({
-          position: userGuess.position,
-          map,
-          icon: fallbackMarkerIcon,
-          title: `${userGuess.name}'s guess (${Math.round(userGuess.distance)} km, ${Math.round(userGuess.score)} pts)`,
-          zIndex: 800 // Lower than the main markers but still high
-        });
-        
-        // Create info window with user info
-        const infoWindow = new maps.InfoWindow({
-          content: `
-            <div style="padding: 12px; max-width: 250px; font-family: Arial, sans-serif;">
-              <div style="font-weight: bold; margin-bottom: 8px; font-size: 16px;">${userGuess.name}</div>
-              <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                <div style="width: 50px; height: 50px; border-radius: 50%; background-color: #3B82F6; 
-                         color: white; display: flex; justify-content: center; align-items: center; 
-                         font-weight: bold; margin-right: 12px; font-size: 18px; border: 3px solid #FFFFFF;">
-                  ${userGuess.name.slice(0, 1).toUpperCase()}
-                </div>
-                <div>
-                  <div style="margin-bottom: 4px;"><strong>Distance:</strong> ${Math.round(userGuess.distance).toLocaleString()} km</div>
-                  <div><strong>Score:</strong> ${Math.round(userGuess.score)} points</div>
-                </div>
-              </div>
-            </div>
-          `
-        });
-        
-        // Add click listener to show info window
-        maps.event.addListener(marker, 'click', function() {
-          infoWindow.open(map, marker);
-        });
-                
-        // If the user has a profile picture, try to use it for an enhanced marker
+        // Only create a marker if user has a profile picture
         if (userGuess.pfpUrl) {
-          // Try to create a profile picture marker as an enhancement
-          // but don't depend on it for the marker to show up
           try {
             // Create a canvas to make a circular image
             const canvas = document.createElement('canvas');
@@ -379,13 +334,13 @@ const ResultsMap: React.FC<ResultsMapProps> = ({
                     anchor: new maps.Point(24, 24)
                   };
                   
-                  // Image loaded successfully, create enhanced marker
+                  // Image loaded successfully, create marker
                   const pfpMarker = new maps.Marker({
                     position: userGuess.position,
                     map,
                     icon: markerIcon,
                     title: `${userGuess.name}'s guess (${Math.round(userGuess.distance)} km, ${Math.round(userGuess.score)} pts)`,
-                    zIndex: 900 // Higher than the fallback marker
+                    zIndex: 900
                   });
                   
                   // Create info window with circular profile picture
@@ -408,7 +363,7 @@ const ResultsMap: React.FC<ResultsMapProps> = ({
                     `
                   });
                   
-                  // Close any other info windows when this one is opened
+                  // Add click listener to show info window
                   maps.event.addListener(pfpMarker, 'click', function() {
                     infoWindow.open(map, pfpMarker);
                   });
@@ -421,14 +376,12 @@ const ResultsMap: React.FC<ResultsMapProps> = ({
             
             img.onerror = () => {
               console.warn(`Failed to load profile picture for circular crop: ${userGuess.pfpUrl}`);
-              // Fallback was already created, so no action needed
             };
                       
             // Set the source to trigger the load
             img.src = userGuess.pfpUrl;
           } catch (error) {
-            console.warn("Failed to create enhanced marker for:", userGuess.name, error);
-            // Fallback already created, so we're good
+            console.warn("Failed to create marker for:", userGuess.name, error);
           }
         }
       } catch (error) {
