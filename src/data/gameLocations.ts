@@ -32,20 +32,15 @@ export const gameLocations: GameLocation[] = [
     answer: 'Fukuoka', 
     hint: 'Japan'
   },
-  { 
-    position: { lat: 1.283404, lng: 103.863134 }, 
-    answer: 'Singapore', 
-    hint: 'Marina Bay'
+  {
+    position: { lat: 42.9299596, lng: 25.867500 },
+    answer: 'Sofia',
+    hint: 'Bulgaria'
   },
   { 
-    position: { lat: 48.858093, lng: 2.294694 }, 
-    answer: 'Paris', 
-    hint: 'Near Eiffel Tower'
-  },
-  { 
-    position: { lat: 51.510020, lng: -0.134730 }, 
-    answer: 'London', 
-    hint: 'Near Hyde Park'
+    position: { lat: 6.509123, lng: 3.366910 }, 
+    answer: 'Lagos', 
+    hint: 'Nigeria, Africa' 
   },
   { 
     position: { lat: 35.6595, lng: 139.7004 }, 
