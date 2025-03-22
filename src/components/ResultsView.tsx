@@ -83,7 +83,10 @@ const ResultsView: React.FC<ResultsViewProps> = ({
               },
               score: entry.score,
               distance: entry.distance
-            }));
+            }))
+            // Sort by score (high to low) and limit to top 100
+            .sort((a: UserGuess, b: UserGuess) => (b.score || 0) - (a.score || 0))
+            .slice(0, 100);
           
           setOtherUsersGuesses(otherGuesses);
         } else {
