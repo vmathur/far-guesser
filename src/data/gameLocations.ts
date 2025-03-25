@@ -47,6 +47,26 @@ export const gameLocations: GameLocation[] = [
     answer: 'Tokyo', 
     hint: 'Shibuya Crossing' 
   },
+  {
+    position: { lat: -33.456180, lng: -70.968689 },
+    answer: 'Santiago',
+    hint: 'Chile'
+  },
+  {
+    position: { lat: 37.529262, lng: 126.841435 },
+    answer: 'Seoul',
+    hint: 'South Korea'
+  },
+  { 
+    position: { lat: 25.1972, lng: 55.2744 }, 
+    answer: 'Dubai', 
+    hint: 'Burj Khalifa' 
+  },
+  {
+    position: { lat: 38.954994, lng: 1.446618 },
+    answer: 'Barcelona',
+    hint: 'Spain'
+  },
   { 
     position: { lat: -33.8567, lng: 151.2131 }, 
     answer: 'Sydney', 
@@ -56,11 +76,6 @@ export const gameLocations: GameLocation[] = [
     position: { lat: 41.8902, lng: 12.4922 }, 
     answer: 'Rome', 
     hint: 'Colosseum' 
-  },
-  { 
-    position: { lat: 25.1972, lng: 55.2744 }, 
-    answer: 'Dubai', 
-    hint: 'Burj Khalifa' 
   },
   { 
     position: { lat: 40.4168, lng: -3.7038 }, 
@@ -76,11 +91,6 @@ export const gameLocations: GameLocation[] = [
     position: { lat: 55.7558, lng: 37.6173 }, 
     answer: 'Moscow', 
     hint: 'Red Square' 
-  },
-  { 
-    position: { lat: 6.509123, lng: 3.366910 }, 
-    answer: 'Lagos', 
-    hint: 'Nigeria, Africa' 
   },
   { 
     position: { lat: -22.9068, lng: -43.1729 }, 
