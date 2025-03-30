@@ -72,6 +72,11 @@ export const gameLocations: GameLocation[] = [
     answer: 'Sydney', 
     hint: 'Near Sydney Opera House' 
   },
+  {
+    position: { lat: 52.00924, lng: 4.542049 }, 
+    answer: 'Amsterdam',
+    hint: 'Netherlands'
+  },
   { 
     position: { lat: 41.8902, lng: 12.4922 }, 
     answer: 'Rome', 
