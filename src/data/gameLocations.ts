@@ -77,10 +77,10 @@ export const gameLocations: GameLocation[] = [
     answer: 'Amsterdam',
     hint: 'Netherlands'
   },
-  { 
-    position: { lat: 41.8902, lng: 12.4922 }, 
-    answer: 'Rome', 
-    hint: 'Colosseum' 
+  {
+    position: { lat: 30.038488, lng: -99.121863 },
+    answer: 'San Antonio',
+    hint: 'Texas'
   },
   { 
     position: { lat: 40.4168, lng: -3.7038 }, 
