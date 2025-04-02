@@ -87,6 +87,11 @@ export const gameLocations: GameLocation[] = [
     answer: 'Madrid', 
     hint: 'Plaza Mayor' 
   },
+  {
+    position: { lat: 20.685773, lng: -156.444236},
+    answer: 'Hawaii', 
+    hint: 'beach' 
+  },
   { 
     position: { lat: 52.5200, lng: 13.4050 }, 
     answer: 'Berlin', 
