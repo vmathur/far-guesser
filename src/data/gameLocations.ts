@@ -92,6 +92,26 @@ export const gameLocations: GameLocation[] = [
     answer: 'Hawaii', 
     hint: 'beach' 
   },
+  {
+    position: {lat: 46.228594, lng: 7.433393},
+    answer: 'switzerland', //thursday
+    hint :'mountains',
+  },
+  {
+    position: {lat: 26.984327, lng: 75.853727},
+    answer: 'Rajasthan', //friday
+    hint: 'palace'
+  },
+  {
+    position: {lat: -33.923370, lng: 18.417895},
+    answer: 'cape town', //saturday
+    hint: 'SA'
+  },
+  {
+    position: {lat: 8.943565, lng:-79.564024},
+    answer: 'panama', //sunday
+    hint: 'bridge'
+  },
   { 
     position: { lat: 52.5200, lng: 13.4050 }, 
     answer: 'Berlin', 
