@@ -202,6 +202,186 @@ export const gameLocations: GameLocation[] = [
     answer: 'Singapore', 
     hint: 'Gardens by the Bay' 
   },
+  {
+    position: { lat: 43.6532, lng: -79.3832 },
+    answer: 'Toronto',
+    hint: 'CN Tower'
+  },
+  {
+    position: { lat: 47.6062, lng: -122.3321 },
+    answer: 'Seattle',
+    hint: 'Space Needle'
+  },
+  {
+    position: { lat: 39.9042, lng: 116.4074 },
+    answer: 'Beijing',
+    hint: 'Forbidden City'
+  },
+  {
+    position: { lat: 41.3851, lng: 2.1734 },
+    answer: 'Barcelona',
+    hint: 'Sagrada Familia'
+  },
+  {
+    position: { lat: 48.8566, lng: 2.3522 },
+    answer: 'Paris',
+    hint: 'Eiffel Tower'
+  },
+  {
+    position: { lat: 51.5074, lng: -0.1278 },
+    answer: 'London',
+    hint: 'Big Ben'
+  },
+  {
+    position: { lat: 40.7128, lng: -74.0060 },
+    answer: 'New York',
+    hint: 'Central Park'
+  },
+  {
+    position: { lat: 34.0522, lng: -118.2437 },
+    answer: 'Los Angeles',
+    hint: 'Hollywood'
+  },
+  {
+    position: { lat: 41.9028, lng: 12.4964 },
+    answer: 'Rome',
+    hint: 'Colosseum'
+  },
+  {
+    position: { lat: 52.3676, lng: 4.9041 },
+    answer: 'Amsterdam',
+    hint: 'Canal District'
+  },
+  {
+    position: { lat: 55.6761, lng: 12.5683 },
+    answer: 'Copenhagen',
+    hint: 'Nyhavn'
+  },
+  {
+    position: { lat: 59.9139, lng: 10.7522 },
+    answer: 'Oslo',
+    hint: 'Viking Ship Museum'
+  },
+  {
+    position: { lat: 60.1699, lng: 24.9384 },
+    answer: 'Helsinki',
+    hint: 'Market Square'
+  },
+  {
+    position: { lat: 52.2297, lng: 21.0122 },
+    answer: 'Warsaw',
+    hint: 'Old Town'
+  },
+  {
+    position: { lat: 47.4979, lng: 19.0402 },
+    answer: 'Budapest',
+    hint: 'Chain Bridge'
+  },
+  {
+    position: { lat: 45.4642, lng: 9.1900 },
+    answer: 'Milan',
+    hint: 'Duomo'
+  },
+  {
+    position: { lat: 37.7749, lng: -122.4194 },
+    answer: 'San Francisco',
+    hint: 'Golden Gate Bridge'
+  },
+  {
+    position: { lat: 39.7392, lng: -104.9903 },
+    answer: 'Denver',
+    hint: 'Rocky Mountains'
+  },
+  {
+    position: { lat: 29.7604, lng: -95.3698 },
+    answer: 'Houston',
+    hint: 'Space Center'
+  },
+  {
+    position: { lat: 41.8781, lng: -87.6298 },
+    answer: 'Chicago',
+    hint: 'Cloud Gate'
+  },
+  {
+    position: { lat: 25.7617, lng: -80.1918 },
+    answer: 'Miami',
+    hint: 'South Beach'
+  },
+  {
+    position: { lat: 45.5155, lng: -122.6789 },
+    answer: 'Portland',
+    hint: 'Rose Garden'
+  },
+  {
+    position: { lat: 36.1699, lng: -115.1398 },
+    answer: 'Las Vegas',
+    hint: 'Strip'
+  },
+  {
+    position: { lat: 32.7157, lng: -117.1611 },
+    answer: 'San Diego',
+    hint: 'Zoo'
+  },
+  {
+    position: { lat: 47.6062, lng: -122.3321 },
+    answer: 'Seattle',
+    hint: 'Pike Place'
+  },
+  {
+    position: { lat: 39.9612, lng: -82.9988 },
+    answer: 'Columbus',
+    hint: 'Ohio State'
+  },
+  {
+    position: { lat: 42.3601, lng: -71.0589 },
+    answer: 'Boston',
+    hint: 'Freedom Trail'
+  },
+  {
+    position: { lat: 38.9072, lng: -77.0369 },
+    answer: 'Washington DC',
+    hint: 'National Mall'
+  },
+  {
+    position: { lat: 35.6762, lng: 139.6503 },
+    answer: 'Shibuya',
+    hint: 'Tokyo District'
+  },
+  {
+    position: { lat: 40.7484, lng: -73.9857 },
+    answer: 'Manhattan',
+    hint: 'NYC Borough'
+  },
+  {
+    position: { lat: 22.5431, lng: 114.0579 },
+    answer: 'Shenzhen',
+    hint: 'Tech Hub'
+  },
+  {
+    position: { lat: 19.4326, lng: -99.1332 },
+    answer: 'Mexico City',
+    hint: 'Zócalo'
+  },
+  {
+    position: { lat: -33.4489, lng: -70.6693 },
+    answer: 'Santiago',
+    hint: 'Andes Mountains'
+  },
+  {
+    position: { lat: 6.5244, lng: 3.3792 },
+    answer: 'Lagos',
+    hint: 'Nigeria'
+  },
+  {
+    position: { lat: 1.2921, lng: 36.8219 },
+    answer: 'Nairobi',
+    hint: 'Kenya'
+  },
+  {
+    position: { lat: 33.9716, lng: -6.8498 },
+    answer: 'Rabat',
+    hint: 'Morocco'
+  }
 ];
 
 /**
