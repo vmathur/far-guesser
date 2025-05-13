@@ -108,7 +108,7 @@ export const gameLocations: GameLocation[] = [
     hint: 'SA'
   },
   {
-    position: {lat: 8.943565, lng:-79.564024},
+    position: {lat: 8.943565, lng:-79.564024}, //20
     answer: 'panama', //sunday
     hint: 'bridge'
   },
@@ -158,7 +158,7 @@ export const gameLocations: GameLocation[] = [
     hint: 'Hagia Sophia' 
   },
   { 
-    position: { lat: 19.4326, lng: -99.1332 }, 
+    position: { lat: 19.4326, lng: -99.1332 }, //30
     answer: 'Mexico City', 
     hint: 'Zócalo' 
   },
@@ -208,12 +208,12 @@ export const gameLocations: GameLocation[] = [
     hint: 'CN Tower'
   },
   {
-    position: { lat: 47.6062, lng: -122.3321 },
+    position: { lat: 47.6062, lng: -122.3321 }, //40
     answer: 'Seattle',
     hint: 'Space Needle'
   },
   {
-    position: { lat: 39.9042, lng: 116.4074 },
+    position: { lat: 39.9042, lng: 116.4074 }, //41
     answer: 'Beijing',
     hint: 'Forbidden City'
   },
@@ -221,11 +221,6 @@ export const gameLocations: GameLocation[] = [
     position: { lat: 41.3851, lng: 2.1734 },
     answer: 'Barcelona',
     hint: 'Sagrada Familia'
-  },
-  {
-    position: { lat: 48.8566, lng: 2.3522 },
-    answer: 'Paris',
-    hint: 'Eiffel Tower'
   },
   {
     position: { lat: 51.5074, lng: -0.1278 },
