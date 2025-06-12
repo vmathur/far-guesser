@@ -373,7 +373,7 @@ export const gameLocations: GameLocation[] = [
     hint: 'Kenya'
   },
   {
-    position: { lat: 33.9716, lng: -6.8498 },
+    position: { lat: 34.00459, lng: -6.827247 },
     answer: 'Rabat',
     hint: 'Morocco'
   },
