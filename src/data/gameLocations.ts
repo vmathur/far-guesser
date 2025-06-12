@@ -376,6 +376,156 @@ export const gameLocations: GameLocation[] = [
     position: { lat: 33.9716, lng: -6.8498 },
     answer: 'Rabat',
     hint: 'Morocco'
+  },
+  {
+    position: { lat: 19.0760, lng: 72.8777 },
+    answer: 'Mumbai',
+    hint: 'Bollywood'
+  },
+  {
+    position: { lat: -12.0464, lng: -77.0428 },
+    answer: 'Lima',
+    hint: 'Peru'
+  },
+  {
+    position: { lat: 33.5731, lng: -7.5898 },
+    answer: 'Casablanca',
+    hint: 'Morocco'
+  },
+  {
+    position: { lat: 55.9533, lng: -3.1883 },
+    answer: 'Edinburgh',
+    hint: 'Scotland'
+  },
+  {
+    position: { lat: 53.3498, lng: -6.2603 },
+    answer: 'Dublin',
+    hint: 'Ireland'
+  },
+  {
+    position: { lat: 38.7223, lng: -9.1393 },
+    answer: 'Lisbon',
+    hint: 'Portugal'
+  },
+  {
+    position: { lat: 32.0853, lng: 34.7818 },
+    answer: 'Tel Aviv',
+    hint: 'Israel'
+  },
+  {
+    position: { lat: 64.1466, lng: -21.9426 },
+    answer: 'Reykjavik',
+    hint: 'Iceland'
+  },
+  {
+    position: { lat: 47.3769, lng: 8.5417 },
+    answer: 'Zurich',
+    hint: 'Switzerland'
+  },
+  {
+    position: { lat: 43.7384, lng: 7.4246 },
+    answer: 'Monaco',
+    hint: 'Monte Carlo'
+  },
+  {
+    position: { lat: 43.7102, lng: 7.2620 },
+    answer: 'Nice',
+    hint: 'French Riviera'
+  },
+  {
+    position: { lat: 50.8503, lng: 4.3517 },
+    answer: 'Brussels',
+    hint: 'Belgium'
+  },
+  {
+    position: { lat: 50.0647, lng: 19.9450 },
+    answer: 'Krakow',
+    hint: 'Poland'
+  },
+  {
+    position: { lat: 44.4268, lng: 26.1025 },
+    answer: 'Bucharest',
+    hint: 'Romania'
+  },
+  {
+    position: { lat: 45.8150, lng: 15.9819 },
+    answer: 'Zagreb',
+    hint: 'Croatia'
+  },
+  {
+    position: { lat: 43.8563, lng: 18.4131 },
+    answer: 'Sarajevo',
+    hint: 'Bosnia'
+  },
+  {
+    position: { lat: 59.4370, lng: 24.7536 },
+    answer: 'Tallinn',
+    hint: 'Estonia'
+  },
+  {
+    position: { lat: 54.6872, lng: 25.2797 },
+    answer: 'Vilnius',
+    hint: 'Lithuania'
+  },
+  {
+    position: { lat: -27.4698, lng: 153.0251 },
+    answer: 'Brisbane',
+    hint: 'Australia'
+  },
+  {
+    position: { lat: -31.9505, lng: 115.8605 },
+    answer: 'Perth',
+    hint: 'Australia'
+  },
+  {
+    position: { lat: -34.9285, lng: 138.6007 },
+    answer: 'Adelaide',
+    hint: 'Australia'
+  },
+  {
+    position: { lat: -36.8485, lng: 174.7633 },
+    answer: 'Auckland',
+    hint: 'New Zealand'
+  },
+  {
+    position: { lat: -41.2865, lng: 174.7762 },
+    answer: 'Wellington',
+    hint: 'New Zealand'
+  },
+  {
+    position: { lat: -43.5321, lng: 172.6362 },
+    answer: 'Christchurch',
+    hint: 'New Zealand'
+  },
+  {
+    position: { lat: -34.9011, lng: -56.1645 },
+    answer: 'Montevideo',
+    hint: 'Uruguay'
+  },
+  {
+    position: { lat: -0.1807, lng: -78.4678 },
+    answer: 'Quito',
+    hint: 'Ecuador'
+  },
+  {
+    position: { lat: -16.2902, lng: -63.5887 },
+    answer: 'La Paz',
+    hint: 'Bolivia'
+  },
+  {
+    position: { lat: -25.2637, lng: -57.5759 },
+    answer: 'Asuncion',
+    hint: 'Paraguay'
+  },
+  {
+    position: { lat: 10.4806, lng: -66.9036 },
+    answer: 'Caracas',
+    hint: 'Venezuela'
+  },
+  {
+    position: { lat: 4.7110, lng: -74.0721 },
+    answer: 'Bogota',
+    hint: 'Colombia'
   }
 ];
 
